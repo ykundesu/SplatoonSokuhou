@@ -1,14 +1,15 @@
 {
   "Quizs":[
   {"Quiz":"",
-  "Answers":[
-    "",
-    "",
-    "",
-    ""
-  ],
-  "Answer":0,
-  "AnswerText":""},
+    "Answers":[
+      "",
+      "",
+      "",
+      ""
+    ],
+    "Answer":0,
+    "AnswerText":""
+  },
   {"Quiz":"スプラトゥーン3のサーモンランの正式名称は？",
   "Answers":[
     "サーモンランNextWave",
