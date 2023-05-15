@@ -95,8 +95,8 @@ while True:
         CreateSchImage(bankaradata[1]["settings"][1], "バンカラマッチ(オープン)", 40).save("bankara_open.png")
         CreateSchImage(GetSchedulesData(schjson, "x")[1]["settings"][0], "Xマッチ", 200).save("xmatch.png")
         medias.append(api.media_upload(filename="regular.png").media_id)
-        medias.append(api.media_upload(filename="bankara_open.png").media_id)
         medias.append(api.media_upload(filename="bankara_challenge.png").media_id)
+        medias.append(api.media_upload(filename="bankara_open.png").media_id)
         medias.append(api.media_upload(filename="xmatch.png").media_id)
         tweettext = "もうすぐでスケジュール更新！\n"
         hourtime = utcnow.hour + 1 + 9
