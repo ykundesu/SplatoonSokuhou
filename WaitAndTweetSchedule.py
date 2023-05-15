@@ -90,10 +90,10 @@ while True:
     if utcnow.minute >= 50:        #ツイートする
         medias = []
         bankaradata = GetSchedulesData(schjson, "bankara")
-        CreateSchImage(GetSchedulesData(schjson, "regular")[0]["settings"][0], "レギュラーマッチ", 120).save("regular.png")
-        CreateSchImage(bankaradata[0]["settings"][0], "バンカラマッチ(チャレンジ)", 10).save("bankara_challenge.png")
-        CreateSchImage(bankaradata[0]["settings"][1], "バンカラマッチ(オープン)", 40).save("bankara_open.png")
-        CreateSchImage(GetSchedulesData(schjson, "x")[0]["settings"][0], "Xマッチ", 200).save("xmatch.png")
+        CreateSchImage(GetSchedulesData(schjson, "regular")[1]["settings"][0], "レギュラーマッチ", 120).save("regular.png")
+        CreateSchImage(bankaradata[1]["settings"][0], "バンカラマッチ(チャレンジ)", 10).save("bankara_challenge.png")
+        CreateSchImage(bankaradata[1]["settings"][1], "バンカラマッチ(オープン)", 40).save("bankara_open.png")
+        CreateSchImage(GetSchedulesData(schjson, "x")[1]["settings"][0], "Xマッチ", 200).save("xmatch.png")
         medias.append(api.media_upload(filename="regular.png").media_id)
         medias.append(api.media_upload(filename="bankara_open.png").media_id)
         medias.append(api.media_upload(filename="bankara_challenge.png").media_id)
