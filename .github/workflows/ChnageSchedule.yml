@@ -20,7 +20,7 @@ jobs:
         with:
           python-version: 3.11
       - name: Checkout
-        - uses: actions/checkout@v3
+        uses: actions/checkout@v3
       - name: Install requirements
         run: |
           pip install -r Schedule-requirements.txt
