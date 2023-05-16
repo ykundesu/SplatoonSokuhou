@@ -207,10 +207,10 @@ def CreateSchImage(jsons, text, text_x, IsBackPaste = True):
         img = back
     return img
 while True:
-    utcnow = datetime.utcnow()
-    if utcnow.hour <= 21:
-        break
-    if utcnow.hour == 23 and utcnow.minute >= 0:        #ツイートする
+        utcnow = datetime.utcnow()
+    #if utcnow.hour <= 21:
+    #    break
+    #if utcnow.hour == 23 and utcnow.minute >= 0:        #ツイートする
         medias = []
         bankaradata = GetSchedulesData(schjson, "bankara")
         regular = CreateSchImage(GetSchedulesData(schjson, "regular")[0]["settings"][0], "レギュラーマッチ", 120, False)
