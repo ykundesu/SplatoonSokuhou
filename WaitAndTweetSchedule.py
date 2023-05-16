@@ -227,7 +227,7 @@ while True:
         medias.append(api.media_upload(filename="bankara.png").media_id)
         medias.append(api.media_upload(filename="xmatch.png").media_id)
         isbreak = True
-        if ((salmondata[1]["start"] - datetime.utcnow()).hours <= 0):
+        if ((salmondata[1]["start"] - datetime.utcnow()).total_seconds() <= 3600):
             CreateSalmonImage(salmondata[1],"サーモンラン", 300).save("salmon.png")
             medias.append(api.media_upload(filename="salmon.png").media_id)
             isbreak = False
