@@ -128,7 +128,7 @@ def CreateSalmonImage(jsons, text, text_x, IsBackPaste = True):
     if datetime.utcnow() > jsons["start"]:
         starttext = ""
     else:
-        starttext = jsons["start"].strftime('%Y年%m月%d日%H時')+"開始"
+        starttext = (jsons["start"] + datetime.timedelta(hours=9)).strftime('%Y年%m月%d日%H時')+"開始"
     draw.text((550, 80), starttext, font = font_mini, fill = "#FFFFFF")
 
     #オカシラシャケ
@@ -143,7 +143,12 @@ def CreateSalmonImage(jsons, text, text_x, IsBackPaste = True):
                               int(weaponimg.size[1] / 2)))
         additional = 140
         img.paste(weaponimg, (40 + additional + (index * 140), 425), weaponimg)
-        draw.text((50 + additional + (index * 140), 550), GetTranslation("weapons", weapon["name"]), font = font_supermini, fill = "#FFFFFF")
+        weapontext = weapon["name"]
+        if weapontext is not "6e17fbe20efecca9":
+            weapontext = GetTranslation("weapons", weapontext)
+        else:
+            weapontext = ""
+        draw.text((50 + additional + (index * 140), 550), weapontext, font = font_supermini, fill = "#FFFFFF")
         index += 1
     back.paste(img, (30,10))
     return back
@@ -246,6 +251,6 @@ while True:
             medias.append(api.media_upload(filename="teamcont.png").media_id)
         tweettext =  "みなさん、おはようございます！\n"
         tweettext += "以下が現在のスケジュールです！\n"
-        tweettext += "次のスケジュール変更は1時間後(午前9時)です！\n"
+        tweettext += "次のスケジュール変更は1時間後(午前9時)です！"
         client.create_tweet(text=tweettext, media_ids = medias)
         break

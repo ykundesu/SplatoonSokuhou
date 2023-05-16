@@ -4,6 +4,7 @@ import requests
 from datetime import datetime
 from PIL import Image, ImageDraw, ImageFont
 import io
+import time
 #secretsで設定した値をとる
 CONSUMER_KEY = os.environ.get('CONSUMER_KEY', "")
 CONSUMER_SECRET = os.environ.get('CONSUMER_SECRET', "")
@@ -127,7 +128,7 @@ def CreateSalmonImage(jsons, text, text_x, IsBackPaste = True):
     if datetime.utcnow() > jsons["start"]:
         starttext = ""
     else:
-        starttext = jsons["start"].strftime('%Y年%m月%d日%H時')+"開始"
+        starttext = (jsons["start"] + datetime.timedelta(hours=9)).strftime('%Y年%m月%d日%H時')+"開始"
     draw.text((550, 80), starttext, font = font_mini, fill = "#FFFFFF")
 
     #オカシラシャケ
@@ -142,7 +143,12 @@ def CreateSalmonImage(jsons, text, text_x, IsBackPaste = True):
                               int(weaponimg.size[1] / 2)))
         additional = 140
         img.paste(weaponimg, (40 + additional + (index * 140), 425), weaponimg)
-        draw.text((50 + additional + (index * 140), 550), GetTranslation("weapons", weapon["name"]), font = font_supermini, fill = "#FFFFFF")
+        weapontext = weapon["name"]
+        if weapontext is not "6e17fbe20efecca9":
+            weapontext = GetTranslation("weapons", weapontext)
+        else:
+            weapontext = ""
+        draw.text((50 + additional + (index * 140), 550), weapontext, font = font_supermini, fill = "#FFFFFF")
         index += 1
     back.paste(img, (30,10))
     return back
@@ -197,11 +203,12 @@ def CreateSchImage(jsons, text, text_x, IsBackPaste = True):
         back.paste(img, (105,10))
         img = back
     return img
+IsTweeted = False
 while True:
     utcnow = datetime.utcnow()
-    if utcnow.hour % 2 == 0:
+    if utcnow.hour % 2 == 0 and not IsTweeted:
         break
-    if utcnow.minute >= 50:        #ツイートする
+    if utcnow.minute >= 50 and not IsTweeted:        #ツイートする
         medias = []
         bankaradata = GetSchedulesData(schjson, "bankara")
         CreateSchImage(GetSchedulesData(schjson, "regular")[1]["settings"][0], "レギュラーマッチ", 120).save("regular.png")
@@ -219,14 +226,31 @@ while True:
         medias.append(api.media_upload(filename="regular.png").media_id)
         medias.append(api.media_upload(filename="bankara.png").media_id)
         medias.append(api.media_upload(filename="xmatch.png").media_id)
+        isbreak = True
         if ((salmondata[1]["start"] - datetime.utcnow()).hours <= 0):
             CreateSalmonImage(salmondata[1],"サーモンラン", 300).save("salmon.png")
             medias.append(api.media_upload(filename="salmon.png").media_id)
+            isbreak = False
         tweettext = "もうすぐでスケジュール更新！\n"
         hourtime = utcnow.hour + 1 + 9
         if hourtime >= 24:
             hourtime -= 24
         tweettext += str(hourtime) + "時からのスケジュールです！"
         client.create_tweet(text=tweettext, media_ids = medias)
-        break
-        
+        IsTweeted = True
+        if isbreak:
+            break
+    elif IsTweeted and utcnow.hour % 2 == 0:
+        time.sleep(30)
+        schjson = requests.get("https://splatoon3.ink/data/schedules.json").json()
+        salmondata = GetSalmonData(schjson, "regular")
+        if salmondata[0]["end"] > datetime.utcnow():
+            CreateSalmonImage(salmondata[-1],"サーモンラン", 300).save("salmonnew.png")
+            medias = []
+            medias.append(api.media_upload(filename="salmonnew.png").media_id)
+            tweettext =  "新しいサーモンランのスケジュールが公開されました！\n"
+            tweettext += "開始▼\n"
+            tweettext += (jsons["start"] + datetime.timedelta(hours=9)).strftime('%Y年%m月%d日%H時')+"\n"
+            client.create_tweet(text=tweettext, media_ids = medias)
+            break
+        time.sleep(30)
