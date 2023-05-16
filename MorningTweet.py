@@ -247,7 +247,7 @@ while True:
             CreateSalmonImage(GetSalmonData(schjson, "bigRun")[0],"ビッグラン", 300).save("bigrun.png")
             medias.append(api.media_upload(filename="bigrun.png").media_id)
         elif len(schjson["data"]["coopGroupingSchedule"]["teamContestSchedules"]["nodes"]) > 0:
-            CreateSalmonImage(GetSalmonData(schjson, "bigRun")[0],"バイトチームコンテスト", 280).save("teamcont.png")
+            CreateSalmonImage(GetSalmonData(schjson, "teamContest")[0],"バイトチームコンテスト", 280).save("teamcont.png")
             medias.append(api.media_upload(filename="teamcont.png").media_id)
         tweettext =  "みなさん、おはようございます！\n"
         tweettext += "以下が現在のスケジュールです！\n"
