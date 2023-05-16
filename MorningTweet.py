@@ -207,10 +207,10 @@ def CreateSchImage(jsons, text, text_x, IsBackPaste = True):
         img = back
     return img
 while True:
-        utcnow = datetime.utcnow()
-    #if utcnow.hour <= 21:
-    #    break
-    #if utcnow.hour == 23 and utcnow.minute >= 0:        #ツイートする
+    utcnow = datetime.utcnow()
+    if utcnow.hour <= 21:
+        break
+    if utcnow.hour == 23 and utcnow.minute >= 0:        #ツイートする
         medias = []
         bankaradata = GetSchedulesData(schjson, "bankara")
         regular = CreateSchImage(GetSchedulesData(schjson, "regular")[0]["settings"][0], "レギュラーマッチ", 120, False)
@@ -252,14 +252,14 @@ while True:
         tweettext =  "みなさん、おはようございます！\n"
         if utcnow.month==5:
             if utcnow.day==31:
-               tweettext+="本日、ついに新シーズンが開始します！！！早く遊んでみたいですね！¥n"
+               tweettext+="本日、ついに！ついに！ついに！！！\n新シーズンが開始します！！！早く遊んでみたいですね！\n"
             elif utcnow.day==30:
-               tweettext+="ついに、明日！！！新シーズンが開始します！！！新要素が楽しみですね！¥n"
+               tweettext+="ついに、明日！！！新シーズンが開始します！！！新要素が楽しみですね！\n"
             else:
-               tweettext+="新シーズンまで！後！！！"+str(31-utcnow.day)+"日！！！楽しみすぎる！¥n"
+               tweettext+="新シーズンまで！後！！！"+str(31-utcnow.day)+"日！！！\n楽しみすぎる！\n"
         tweettext += "以下が現在のスケジュールです！\n"
         if utcnow.month==5 and utcnow.day==31:
-         tweettext+="新シーズンは1時間後(午前9時)です！¥n新武器や新ステージ、イベントマッチなど、新要素を楽しみましょう！"
+         tweettext+="新シーズンは1時間後(午前9時)です！\n新武器や新ステージ、イベントマッチなど、新要素を楽しみましょう！"
         else:
          tweettext += "次のスケジュール変更は1時間後(午前9時)です！"
         client.create_tweet(text=tweettext, media_ids = medias)
