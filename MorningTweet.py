@@ -22,7 +22,7 @@ client = tweepy.Client(
 	access_token_secret = ACCESS_SECRET
 )
 transjson = requests.get("https://splatoon3.ink/data/locale/ja-JP.json").json()
-def GetTranlsation(transtype, textid):
+def GetTranslation(transtype, textid):
     return transjson.get(transtype,{}).get(textid, {}).get("name","翻訳できませんでした。")
 def GetSchedulesData(jsonobj, mode):
     objs = []
@@ -49,6 +49,7 @@ def GetSchedulesData(jsonobj, mode):
             obj["settings"].append(settingobj)
         objs.append(obj)
     return objs
+
 schjson = requests.get("https://splatoon3.ink/data/schedules.json").json()
 
 def crop_center(pil_img, crop_width, crop_height):
@@ -163,7 +164,7 @@ def CreateSchImage(jsons, text, text_x, IsBackPaste = True):
     
     rx = 10
     ry = 20
-    fillcolor = "#FFFFFF"
+    fillcolor = "#000000"
 
     font = ImageFont.truetype("Corporate-Logo-Rounded-Bold-ver3.otf", 60)
 
@@ -178,19 +179,22 @@ def CreateSchImage(jsons, text, text_x, IsBackPaste = True):
     draw.pieslice((mask.size[0]-1-rx*2,0)+
                  (mask.size[0]-1,ry*2), 270, 360, fill=fillcolor)
     
+    im_2 = Image.new(mode=img.mode, size=img.size, color=(0,0,0,0))
+    Image.composite(img, im_2, mask)
+    
     draw = ImageDraw.Draw(img)
     draw.text((text_x, 0), text, font = font , fill = "#FFFFFF")
     
     page = Image.open(io.BytesIO(requests.get(jsons["stages"][0]["image"]).content))
     page = page.resize((int(page.width * 1.25), int(page.height * 1.25)))
-    draw.text((160, 70), GetTranlsation("rules", jsons["rule"]), font = font , fill = "#FFFFFF")
+    draw.text((160, 70), GetTranslation("rules", jsons["rule"]), font = font , fill = "#FFFFFF")
     img.paste(page, (50, 150))
-    draw.text((120, 420), GetTranlsation("stages", jsons["stages"][0]["name"]), font = font , fill = "#FFFFFF")
+    draw.text((120, 420), GetTranslation("stages", jsons["stages"][0]["name"]), font = font , fill = "#FFFFFF")
 
     page = Image.open(io.BytesIO(requests.get(jsons["stages"][1]["image"]).content))
     page = page.resize((int(page.width * 1.25), int(page.height * 1.25)))    
     img.paste(page, (50, 490))
-    draw.text((120, 760), GetTranlsation("stages", jsons["stages"][1]["name"]), font = font , fill = "#FFFFFF")
+    draw.text((120, 760), GetTranslation("stages", jsons["stages"][1]["name"]), font = font , fill = "#FFFFFF")
     
     del draw
     if IsBackPaste:
@@ -198,35 +202,50 @@ def CreateSchImage(jsons, text, text_x, IsBackPaste = True):
         img = back
     return img
 while True:
-    utcnow = datetime.utcnow()
-    if utcnow.hour % 2 == 0:
-        break
-    if utcnow.minute >= 50:        #ツイートする
+        utcnow = datetime.utcnow()
+    #if utcnow.hour <= 21:
+    #    break
+    #if utcnow.hour == 23 and utcnow.minute >= 0:        #ツイートする
         medias = []
         bankaradata = GetSchedulesData(schjson, "bankara")
-        CreateSchImage(GetSchedulesData(schjson, "regular")[1]["settings"][0], "レギュラーマッチ", 120).save("regular.png")
+        regular = CreateSchImage(GetSchedulesData(schjson, "regular")[0]["settings"][0], "レギュラーマッチ", 120, False)
 
-        bankaraopen = CreateSchImage(bankaradata[1]["settings"][0], "バンカラマッチ(チャレンジ)", 10, False)
-        bankarachallenge = CreateSchImage(bankaradata[1]["settings"][1], "バンカラマッチ(オープン)", 40, False)
+        bankarachallenge = CreateSchImage(bankaradata[0]["settings"][0], "バンカラマッチ(チャレンジ)", 10, False)
 
-        back = Image.open("SplatoonBack_White.png").crop((0,0,1450,920))
-        back.paste(bankaraopen, (105,10))
-        back.paste(bankarachallenge, (755,10))
-        back.save("bankara.png")
+        bankaraopen = CreateSchImage(bankaradata[0]["settings"][1], "バンカラマッチ(オープン)", 40, False)
+
+        xmatch = CreateSchImage(GetSchedulesData(schjson, "x")[0]["settings"][0], "Xマッチ", 200, False)
+
+        back = Image.open("SplatoonBack_White.png").crop((0,0,1920,1080))
+        regular = regular.resize((int(regular.size[0] / 1.45),
+                                 int(regular.size[1] / 1.45)))
+        bankaraopen = bankaraopen.resize((int(bankaraopen.size[0] / 1.45),
+                                         int(bankaraopen.size[1] / 1.45)))
+        bankarachallenge = bankarachallenge.resize((int(bankarachallenge.size[0] / 1.45),
+                                                   int(bankarachallenge.size[1] / 1.45)))
+        xmatch = xmatch.resize((int(xmatch.size[0] / 1.45),
+                               int(xmatch.size[1] / 1.45)))
+        back = back.resize((int(back.size[0] * 1.2),
+                     int(back.size[1] * 1.2)))
+        back = back.crop((0,0,int(back.size[0] / 1.4),back.size[1]))
+        back.paste(regular, (60,20))
+        back.paste(bankaraopen, (580,20))
+        back.paste(bankarachallenge, (1100,20))
+        back.paste(xmatch, (400,650))
+        back.save("battle.png")
         
-        CreateSchImage(GetSchedulesData(schjson, "x")[1]["settings"][0], "Xマッチ", 200).save("xmatch.png")
-        salmondata = GetSalmonData(schjson, "regular")
-        medias.append(api.media_upload(filename="regular.png").media_id)
-        medias.append(api.media_upload(filename="bankara.png").media_id)
-        medias.append(api.media_upload(filename="xmatch.png").media_id)
-        if ((salmondata[1]["start"] - datetime.utcnow()).hours <= 0):
-            CreateSalmonImage(salmondata[1],"サーモンラン", 300).save("salmon.png")
-            medias.append(api.media_upload(filename="salmon.png").media_id)
-        tweettext = "もうすぐでスケジュール更新！\n"
-        hourtime = utcnow.hour + 1 + 9
-        if hourtime >= 24:
-            hourtime -= 24
-        tweettext += str(hourtime) + "時からのスケジュールです！"
+        CreateSalmonImage(GetSalmonData(schjson, "regular")[0],"サーモンラン", 300).save("salmon.png")
+        #elif len(schjson["data"]["coopGroupingSchedule"]["teamContestSchedules"]["nodes"]) > 0:
+        medias.append(api.media_upload(filename="battle.png").media_id)
+        medias.append(api.media_upload(filename="salmon.png").media_id)
+        if len(schjson["data"]["coopGroupingSchedule"]["bigRunSchedules"]["nodes"]) > 0:
+            CreateSalmonImage(GetSalmonData(schjson, "bigRun")[0],"ビッグラン", 300).save("bigrun.png")
+            medias.append(api.media_upload(filename="bigrun.png").media_id)
+        elif len(schjson["data"]["coopGroupingSchedule"]["teamContestSchedules"]["nodes"]) > 0:
+            CreateSalmonImage(GetSalmonData(schjson, "bigRun")[0],"バイトチームコンテスト", 280).save("teamcont.png")
+            medias.append(api.media_upload(filename="teamcont.png").media_id)
+        tweettext =  "みなさん、おはようございます！\n"
+        tweettext += "以下が現在のスケジュールです！\n"
+        tweettext += "次のスケジュール変更は1時間後(午前9時)です！\n"
         client.create_tweet(text=tweettext, media_ids = medias)
         break
-        
