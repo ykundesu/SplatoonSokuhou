@@ -83,6 +83,7 @@ def CreateSchImage(jsons, text, text_x):
     draw.text((120, 760), GetTranlsation("stages", jsons["stages"][1]["name"]), font = font , fill = "#FFFFFF")
     del draw
     return img
+print(str(datetime.utcnow()))
 while True:
     utcnow = datetime.utcnow()
     if utcnow.hour % 2 == 0:
