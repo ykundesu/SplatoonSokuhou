@@ -6,7 +6,14 @@ with open("SalmonWeapons.json",mode="r",encoding="utf-8") as f:
     newtext = f.read()
 for weapon in weapons:
     print("ーーー"+weapon["name"]+"ーーー")
+    if weapon["name"] in newtext:
+        print("データ入力済みのためパス")
+        continue
+    if weapon["name"].endswith("コラボ") or weapon["name"].endswith("ネオ"):
+        print("コラボかネオのためパス")
+        continue
     if input("IS(なにか入力されてたらパス):") is not "":
+        print("入力されたためパス")
         continue
     newtext += weapon["name"]+","
     weapondata = requests.get("https://wikiwiki.jp/splatoon3mix/ブキ/"+weapon["name"]).text
