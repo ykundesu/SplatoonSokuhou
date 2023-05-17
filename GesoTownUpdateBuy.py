@@ -1,0 +1,252 @@
+import os
+import tweepy
+import requests
+from datetime import datetime
+from PIL import Image, ImageDraw, ImageFont
+import io
+#secretsで設定した値をとる
+CONSUMER_KEY = os.environ.get('CONSUMER_KEY', "")
+CONSUMER_SECRET = os.environ.get('CONSUMER_SECRET', "")
+ACCESS_TOKEN = os.environ.get('ACCESS_TOKEN', "")
+ACCESS_SECRET = os.environ.get('ACCESS_SECRET', "")
+
+#認証
+auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
+auth.set_access_token(ACCESS_TOKEN, ACCESS_SECRET)
+#オブジェクト作成
+api = tweepy.API(auth)
+client = tweepy.Client(
+	consumer_key = CONSUMER_KEY,
+	consumer_secret = CONSUMER_SECRET,
+	access_token = ACCESS_TOKEN,
+	access_token_secret = ACCESS_SECRET
+)
+transjson = requests.get("https://splatoon3.ink/data/locale/ja-JP.json").json()
+def GetTranslation(transtype, textid):
+    return transjson.get(transtype,{}).get(textid, {}).get("name","翻訳できませんでした。")
+def GetSchedulesData(jsonobj, mode):
+    objs = []
+    for sch in jsonobj["data"][mode + "Schedules"]["nodes"]:
+        obj = {}
+        obj["start"] = datetime.strptime(sch.get("startTime"), '%Y-%m-%dT%H:%M:%SZ')
+        obj["end"] = datetime.strptime(sch.get("endTime"), '%Y-%m-%dT%H:%M:%SZ')
+        obj["settings"] = []
+
+        if mode == "bankara":
+            settings = sch.get(mode+"MatchSettings", [])
+        else:
+            settings = [sch.get(mode+"MatchSetting", {})]
+        for setting in settings:
+            settingobj = {}
+            settingobj["rule"] = setting.get("vsRule", {}).get("id", "")
+            stages = []
+            for stage in setting.get("vsStages", []):
+                stageobj = {}
+                stageobj["name"] = stage.get("id")
+                stageobj["image"] = stage.get("image", {}).get("url", "")
+                stages.append(stageobj)
+            settingobj["stages"] = stages
+            obj["settings"].append(settingobj)
+        objs.append(obj)
+    return objs
+
+def crop_center(pil_img, crop_width, crop_height):
+    img_width, img_height = pil_img.size
+    return pil_img.crop((
+        (img_width - crop_width) // 2,
+        (img_height - crop_height) // 2,
+        (img_width + crop_width) // 2,
+        (img_height + crop_height) // 2
+        ))
+
+def crop_max_square(pil_img):
+    return crop_center(pil_img, min(pil_img.size), min(pil_img.size))
+
+def make(pil_img, r=100, fil=True):
+    mask = DrawBack(pil_img, r)
+    if fil:
+        mask = mask.filter(ImageFilter.SMOOTH)
+    result = pil_img.copy()
+    result.putalpha(mask)
+
+    return result
+
+
+def DrawBack(img, r=100):
+    #角丸四角を描画する[3]を参考。というかほぼコピペ。
+    mask = Image.new("L", img.size, 0)
+    draw = ImageDraw.Draw(mask)
+    rx = r
+    ry = r
+    fillcolor = "#ffffff"
+    draw.rectangle((0,ry)+(mask.size[0]-1,mask.size[1]-1-ry), fill=fillcolor)
+    draw.rectangle((rx,0)+(mask.size[0]-1-rx,mask.size[1]-1), fill=fillcolor)
+    draw.pieslice((0,0)+(rx*2,ry*2), 180, 270, fill=fillcolor)
+    draw.pieslice((0,mask.size[1]-1-ry*2)+(rx*2,mask.size[1]-1), 90, 180, fill=fillcolor)
+    draw.pieslice((mask.size[0]-1-rx*2,mask.size[1]-1-ry*2)+
+    (mask.size[0]-1,mask.size[1]-1), 0, 180, fill=fillcolor)
+    draw.pieslice((mask.size[0]-1-rx*2,0)+
+    (mask.size[0]-1,ry*2), 270, 360, fill=fillcolor)
+    return mask
+def GetSalmonData(jsonobj, mode):
+    objs = []
+    for sch in jsonobj["data"]["coopGroupingSchedule"][mode + "Schedules"]["nodes"]:
+        obj = {}
+        obj["start"] = datetime.strptime(sch.get("startTime"), '%Y-%m-%dT%H:%M:%SZ')
+        obj["end"] = datetime.strptime(sch.get("endTime"), '%Y-%m-%dT%H:%M:%SZ')
+        obj["stagename"] = sch.get("setting",{}).get("coopStage",{}).get("id","翻訳がありません")
+        obj["stageimage"] = sch.get("setting",{}).get("coopStage",{}).get("image",{}).get("url","")
+        obj["kingsalmonid"] = sch.get("__splatoon3ink_king_salmonid_guess")
+        obj["weapons"] = []
+        for weapon in sch.get("setting",{}).get("weapons",[]):
+            obj["weapons"].append({
+                "name":weapon.get("__splatoon3ink_id","翻訳がありませんでした"),
+                "image":weapon.get("image",{}).get("url")
+                })
+        objs.append(obj)
+    return objs
+def CreateSalmonImage(jsons, text, text_x, IsBackPaste = True):
+    back = Image.open("SplatoonBack_White.png").crop((0,0,960,625))
+    img = Image.open("SplatoonBack_Black.png").crop((0,0,900,600))
+    font = ImageFont.truetype("Corporate-Logo-Rounded-Bold-ver3.otf", 60)
+    font_big = ImageFont.truetype("Corporate-Logo-Rounded-Bold-ver3.otf", 65)
+    font_chu = ImageFont.truetype("Corporate-Logo-Rounded-Bold-ver3.otf", 45)
+    font_mini = ImageFont.truetype("Corporate-Logo-Rounded-Bold-ver3.otf", 30)
+    font_supermini = ImageFont.truetype("Corporate-Logo-Rounded-Bold-ver3.otf", 20)
+    draw = ImageDraw.Draw(img)
+    
+    draw.text((text_x, 0), text, font = font, fill = "#FFFFFF")
+
+    draw.text((120, 350), GetTranslation("stages", jsons["stagename"]), font = font, fill = "#FFFFFF")
+    stage = Image.open(io.BytesIO(requests.get(jsons["stageimage"]).content))
+    stage = stage.resize((int(stage.size[0] / 1.7),
+                          int(stage.size[1] / 1.7)))
+    img.paste(stage, (50, 80))
+    
+    if datetime.utcnow() > jsons["start"]:
+        starttext = ""
+    else:
+        starttext = (jsons["start"] + datetime.timedelta(hours=9)).strftime('%Y年%m月%d日%H時')+"開始"
+    draw.text((550, 80), starttext, font = font_mini, fill = "#FFFFFF")
+
+    #オカシラシャケ
+    draw.text((545, 130), "オカシラシャケ", font = font_big, fill = "#FFFFFF")
+    draw.text((615, 200), GetSalmonoidName(jsons["kingsalmonid"]), font = font_chu, fill = "#FFFFFF")
+    
+    #武器
+    index = 0
+    for weapon in jsons["weapons"]:
+        weaponimg = Image.open(io.BytesIO(requests.get(weapon["image"]).content))
+        weaponimg = weaponimg.resize((int(weaponimg.size[0] / 2),
+                              int(weaponimg.size[1] / 2)))
+        additional = 140
+        img.paste(weaponimg, (40 + additional + (index * 140), 425), weaponimg)
+        weapontext = weapon["name"]
+        if weapontext is not "6e17fbe20efecca9":
+            weapontext = GetTranslation("weapons", weapontext)
+        else:
+            weapontext = ""
+        draw.text((50 + additional + (index * 140), 550), weapontext, font = font_supermini, fill = "#FFFFFF")
+        index += 1
+    back.paste(img, (30,10))
+    return back
+def GetSalmonoidName(salmonid):
+    if salmonid == "Cohozuna":
+        return "ヨコズナ"
+    elif salmonid == "Horrorboros":
+        return "タツ"
+    elif salmonid == None:
+        return "翻訳がありませんでした"
+    else:
+        return salmonid
+def CreateSchImage(jsons, text, text_x, IsBackPaste = True):
+    back = Image.open("SplatoonBack_White.png").crop((0,0,800,920))
+    img = Image.open("SplatoonBack_Black.png").crop((0,0,600,900))
+    #img = make(img, 10, False)
+    #Image.new("RGBA", (600, 900), (107, 107, 107))
+    
+    rx = 10
+    ry = 20
+    fillcolor = "#000000"
+
+    font = ImageFont.truetype("Corporate-Logo-Rounded-Bold-ver3.otf", 60)
+
+    mask = Image.new("L", img.size, 0)
+    draw = ImageDraw.Draw(mask)
+    draw.rectangle((0,ry)+(mask.size[0]-1,mask.size[1]-1-ry), fill=fillcolor)
+    draw.rectangle((rx,0)+(mask.size[0]-1-rx,mask.size[1]-1), fill=fillcolor)
+    draw.pieslice((0,0)+(rx*2,ry*2), 180, 270, fill=fillcolor)
+    draw.pieslice((0,mask.size[1]-1-ry*2)+(rx*2,mask.size[1]-1), 90, 180, fill=fillcolor)
+    draw.pieslice((mask.size[0]-1-rx*2,mask.size[1]-1-ry*2)+
+                  (mask.size[0]-1,mask.size[1]-1), 0, 180, fill=fillcolor)
+    draw.pieslice((mask.size[0]-1-rx*2,0)+
+                 (mask.size[0]-1,ry*2), 270, 360, fill=fillcolor)
+    
+    im_2 = Image.new(mode=img.mode, size=img.size, color=(0,0,0,0))
+    Image.composite(img, im_2, mask)
+    
+    draw = ImageDraw.Draw(img)
+    draw.text((text_x, 0), text, font = font , fill = "#FFFFFF")
+    
+    page = Image.open(io.BytesIO(requests.get(jsons["stages"][0]["image"]).content))
+    page = page.resize((int(page.width * 1.25), int(page.height * 1.25)))
+    draw.text((160, 70), GetTranslation("rules", jsons["rule"]), font = font , fill = "#FFFFFF")
+    img.paste(page, (50, 150))
+    draw.text((120, 420), GetTranslation("stages", jsons["stages"][0]["name"]), font = font , fill = "#FFFFFF")
+
+    page = Image.open(io.BytesIO(requests.get(jsons["stages"][1]["image"]).content))
+    page = page.resize((int(page.width * 1.25), int(page.height * 1.25)))    
+    img.paste(page, (50, 490))
+    draw.text((120, 760), GetTranslation("stages", jsons["stages"][1]["name"]), font = font , fill = "#FFFFFF")
+    
+    del draw
+    if IsBackPaste:
+        back.paste(img, (105,10))
+        img = back
+    return img
+while True:
+    utcnow = datetime.utcnow()
+    if utcnow.hour % 4 is 1 or utcnow.hour % 4 is 2:
+        break
+    if utcnow.minute > 0 and utcnow.hour % 4 is 0:
+        schjson = requests.get("https://splatoon3.ink/data/gear.json").json()
+        gears = []
+        for data in schjson["data"]["gesotown"]["limitedGears"]:
+            gear = {}
+            gear["price"] = int(data.get("price"))
+            gear["end"] = datetime.strptime(sch.get("saleEndTime"), '%Y-%m-%d %H:%M:%S')
+            gear["name"] = data.get("gear",{}).get("__splatoon3ink_id","名前なし")
+            gear["mainpower"] = data.get("gear",{}).get("primaryGearPower",{}).get("__splatoon3ink_id","名前なし")
+            gear["mainpowerimg"] = data.get("gear",{}).get("primaryGearPower",{}).get("image",{}).get("url")
+            gear["addpowers"] = []
+            for power in data["gear"]["additionalGearPowers"]:
+                addpower = {}
+                addpower["name"] = power.get("__splatoon3ink_id","名前なし")
+                addpower["img"] = power.get("image",{}).get("url")
+                gear["addpowers"].append(addpower)
+            gears.append(gear)
+        medias = []
+        back = back.resize((int(back.size[0] * 1.2),
+                     int(back.size[1] * 1.2)))
+        back = back.crop((0,0,int(back.size[0] / 1.4),back.size[1]))
+        back.paste(regular, (60,20))
+        back.paste(bankaraopen, (580,20))
+        back.paste(bankarachallenge, (1100,20))
+        back.paste(xmatch, (400,650))
+        back.save("battle.png")
+        
+        CreateSalmonImage(GetSalmonData(schjson, "regular")[0],"サーモンラン", 300).save("salmon.png")
+        #elif len(schjson["data"]["coopGroupingSchedule"]["teamContestSchedules"]["nodes"]) > 0:
+        medias.append(api.media_upload(filename="battle.png").media_id)
+        medias.append(api.media_upload(filename="salmon.png").media_id)
+        if len(schjson["data"]["coopGroupingSchedule"]["bigRunSchedules"]["nodes"]) > 0:
+            CreateSalmonImage(GetSalmonData(schjson, "bigRun")[0],"ビッグラン", 300).save("bigrun.png")
+            medias.append(api.media_upload(filename="bigrun.png").media_id)
+        elif len(schjson["data"]["coopGroupingSchedule"]["teamContestSchedules"]["nodes"]) > 0:
+            CreateSalmonImage(GetSalmonData(schjson, "bigRun")[0],"バイトチームコンテスト", 280).save("teamcont.png")
+            medias.append(api.media_upload(filename="teamcont.png").media_id)
+        tweettext =  "みなさん、おはようございます！\n"
+        tweettext += "以下が現在のスケジュールです！\n"
+        tweettext += "次のスケジュール変更は1時間後(午前9時)です！"
+        client.create_tweet(text=tweettext, media_ids = medias)
+        break
