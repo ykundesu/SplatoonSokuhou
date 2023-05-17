@@ -33,7 +33,7 @@ for weapon in weapons:
     weaponpointtext = re.search(r"インク効率（塗り）</th><td style=\"text-align:center;\">(.*?)p<", weapondata).group(0).replace("インク効率（塗り）</th><td style=\"text-align:center;\">","").replace("p<","")
     newtext += weaponpointtext + ","
     #役割
-    yakuwari = input("役割(0:ザコ処理,1:オオモノ処理,2:塗り,3:金イクラ納品):")
+    yakuwari = input("役割(0:ザコ処理,1:オオモノ処理,2:塗り,3:金イクラ納品,4:すべて):")
     newtext += yakuwari + ","
     kidouryoku = input("機動力(0:低,1:中,2:高):")
     newtext += kidouryoku + ","
