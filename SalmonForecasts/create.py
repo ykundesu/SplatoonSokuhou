@@ -10,7 +10,7 @@ for weapon in weapons:
         continue
     newtext += weapon["name"]+","
     weapondata = requests.get("https://wikiwiki.jp/splatoon3mix/ブキ/"+weapon["name"]).text
-    print(weapondata)
+    #print(weapondata)
     #ブキ重量
     weaponweighttext = re.search(r"ブキ重量</span></th><td style=\"text-align:center;\">(.*?)<", weapondata).group(0).replace("ブキ重量</span></th><td style=\"text-align:center;\">","").replace("<","")
     if weaponweighttext == "最軽":
