@@ -23,7 +23,7 @@ client = tweepy.Client(
 	access_token_secret = ACCESS_SECRET
 )
 transjson = requests.get("https://splatoon3.ink/data/locale/ja-JP.json").json()
-def GetTranlsation(transtype, textid):
+def GetTranslation(transtype, textid):
     return transjson.get(transtype,{}).get(textid, {}).get("name","翻訳できませんでした。")
 def GetSchedulesData(jsonobj, mode):
     objs = []
@@ -189,14 +189,14 @@ def CreateSchImage(jsons, text, text_x, IsBackPaste = True):
     
     page = Image.open(io.BytesIO(requests.get(jsons["stages"][0]["image"]).content))
     page = page.resize((int(page.width * 1.25), int(page.height * 1.25)))
-    draw.text((160, 70), GetTranlsation("rules", jsons["rule"]), font = font , fill = "#FFFFFF")
+    draw.text((160, 70), GetTranslation("rules", jsons["rule"]), font = font , fill = "#FFFFFF")
     img.paste(page, (50, 150))
-    draw.text((120, 420), GetTranlsation("stages", jsons["stages"][0]["name"]), font = font , fill = "#FFFFFF")
+    draw.text((120, 420), GetTranslation("stages", jsons["stages"][0]["name"]), font = font , fill = "#FFFFFF")
 
     page = Image.open(io.BytesIO(requests.get(jsons["stages"][1]["image"]).content))
     page = page.resize((int(page.width * 1.25), int(page.height * 1.25)))    
     img.paste(page, (50, 490))
-    draw.text((120, 760), GetTranlsation("stages", jsons["stages"][1]["name"]), font = font , fill = "#FFFFFF")
+    draw.text((120, 760), GetTranslation("stages", jsons["stages"][1]["name"]), font = font , fill = "#FFFFFF")
     
     del draw
     if IsBackPaste:
@@ -249,7 +249,7 @@ while True:
             medias = []
             medias.append(api.media_upload(filename="salmonnew.png").media_id)
             tweettext =  "新しいサーモンランのスケジュールが公開されました！\n"
-            tweettext += "開始▼\n"
+            tweettext += "▼開始日時\n"
             tweettext += (jsons["start"] + datetime.timedelta(hours=9)).strftime('%Y年%m月%d日%H時')+"\n"
             client.create_tweet(text=tweettext, media_ids = medias)
             break
