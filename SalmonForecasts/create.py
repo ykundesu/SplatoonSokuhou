@@ -6,7 +6,7 @@ with open("SalmonWeapons.json",mode="r",encoding="utf-8") as f:
     newtext = f.read()
 for weapon in weapons:
     print("ーーー"+weapon["name"]+"ーーー")
-    if weapon["name"] in newtext:
+    if weapon["name"]+"," in newtext:
         print("データ入力済みのためパス")
         continue
     if weapon["name"].endswith("コラボ") or weapon["name"].endswith("ネオ"):
