@@ -189,7 +189,7 @@ def CreateSchImage(jsons, text, text_x, IsBackPaste = True):
     
     page = Image.open(io.BytesIO(requests.get(jsons["stages"][0]["image"]).content))
     page = page.resize((int(page.width * 1.25), int(page.height * 1.25)))
-    draw.text((160, 70), GetTranlslation("rules", jsons["rule"]), font = font , fill = "#FFFFFF")
+    draw.text((160, 70), GetTranslation("rules", jsons["rule"]), font = font , fill = "#FFFFFF")
     img.paste(page, (50, 150))
     draw.text((120, 420), GetTranslation("stages", jsons["stages"][0]["name"]), font = font , fill = "#FFFFFF")
 
