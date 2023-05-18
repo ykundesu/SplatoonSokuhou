@@ -9,7 +9,7 @@ for weapon in weapons:
     if weapon["name"]+"," in newtext:
         print("データ入力済みのためパス")
         continue
-    if weapon["name"].endswith("コラボ") or weapon["name"].endswith("ネオ"):
+    if weapon["name"].endswith("コラボ") or weapon["name"].endswith("ネオ") or weapon["name"].endswith("デコ"):
         print("コラボかネオのためパス")
         continue
     if input("IS(なにか入力されてたらパス):") is not "":
@@ -32,9 +32,51 @@ for weapon in weapons:
         print("重さが取得できなかった")
     newtext += weaponweight + ","
     #射程
-    weaponrangetext = re.search(r"有効射程</th><td style=\"text-align:center;\">(.*?)</td><th style=\"text-align:center;\">", weapondata).group(0).replace("有効射程</th><td style=\"text-align:center;\">","").replace("</td><th style=\"text-align:center;\">","")
+    #シューターとフデ
+    weaponrange = re.search(r"有効射程</th><td style=\"text-align:center;\">(.*?)</td><th style=\"text-align:center;\">", weapondata)
+    if weaponrange != None:
+        weaponrangetext = weaponrange.group(0).replace("有効射程</th><td style=\"text-align:center;\">","").replace("</td><th style=\"text-align:center;\">","")
+    else:
+        #ローラー
+        weaponange = re.search(r"確1射程</th><td style=\"text-align:center;\">(.*?)</td><th style=\"text-", weapondata)
+        if weaponrange != None:
+            weaponrangetext = weaponrange.group(0).replace("確1射程</th><td style=\"text-align:center;\">","").replace("</td><th style=\"text-","")
+        else:
+            weaponrange = re.search(r"確2射程</th><td style=\"text-align:center;\">(.*?)</td><th style=\"text-", weapondata)
+            if weaponrange != None:
+                weaponrangetext = weaponrange.group(0).replace("確2射程</th><td style=\"text-align:center;\">","").replace("</td><th style=\"text-","")
+            else:
+                weaponrange = re.search(r"直撃射程</th><td style=\"text-align:center;\">(.*?)</td><th style=\"text-", weapondata)
+                if weaponrange != None:
+                    weaponrangetext = weaponrange.group(0).replace("直撃射程</th><td style=\"text-align:center;\">","").replace("</td><th style=\"text-","")
+                else:
+                    weaponrange = re.search(r"有効射程（インク弾）</th><td rowspan=\"2\" style=\"text-align:center;\">(.*?)</td><th style=", weapondata)
+                    if weaponrange != None:
+                        weaponrangetext = weaponrange.group(0).replace("有効射程（インク弾）</th><td rowspan=\"2\" style=\"text-align:center;\">","").replace("</td><th style=","")
+                    else:
+                        print("エラーが発生しました。射程")
     newtext += weaponrangetext + ","
-    weapondps = re.search(r"DPS</th><td style=\"text-align:center;\">(.*?)/秒</td></tr>", weapondata).group(0).replace("DPS</th><td style=\"text-align:center;\">","").replace("/秒</td></tr>","")
+    weapondpstext = re.search(r"DPS</th><td style=\"text-align:center;\">(.*?)/秒</td></tr>", weapondata)
+    if weapondpstext != None:
+        weapondps = weapondpstext.group(0).replace("DPS</th><td style=\"text-align:center;\">","").replace("/秒</td></tr>","")
+    else:
+        weapondpstext = re.search(r"DPS（チャージ時間含む）</th><td style=\"text-align:center;\">(.*?)/秒</td></tr>", weapondata)
+        if weapondpstext != None:
+            weapondps = weapondpstext.group(0).replace("DPS（チャージ時間含む）</th><td style=\"text-align:center;\">","").replace("/秒</td></tr>","")
+        else:
+            weapondpstext = re.search(r"DPS（最大）</th><td style=\"text-align:center;\">(.*?)/秒</td></tr>", weapondata)
+            if weapondpstext != None:
+                weapondps = weapondpstext.group(0).replace("DPS（最大）</th><td style=\"text-align:center;\">","").replace("/秒</td></tr>","")
+            else:
+                weapondpstext = re.search(r"DPS（直撃）</th><td style=\"text-align:center;\">(.*?)/秒</td></tr>", weapondata)
+                if weapondpstext != None:
+                    weapondps = weapondpstext.group(0).replace("DPS（直撃）</th><td style=\"text-align:center;\">","").replace("/秒</td></tr>","")
+                else:
+                    weapondpstext = re.search(r"DPS（インク弾）</th><td style=\"text-align:center;\">(.*?)/秒</td></tr>", weapondata)
+                    if weapondpstext != None:
+                        weapondps = weapondpstext.group(0).replace("DPS（インク弾）</th><td style=\"text-align:center;\">","").replace("/秒</td></tr>","")
+                    else:
+                        print("エラーが発生しました。DPS")
     newtext += weapondps + ","
     #インク効率
     weaponpointtext = re.search(r"インク効率（塗り）</th><td style=\"text-align:center;\">(.*?)p<", weapondata).group(0).replace("インク効率（塗り）</th><td style=\"text-align:center;\">","").replace("p<","")
