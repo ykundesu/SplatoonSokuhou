@@ -115,6 +115,13 @@ def CreateSalmonImage(jsons, text, text_x, IsBackPaste = True):
     font_chu = ImageFont.truetype("Corporate-Logo-Rounded-Bold-ver3.otf", 45)
     font_mini = ImageFont.truetype("Corporate-Logo-Rounded-Bold-ver3.otf", 30)
     font_supermini = ImageFont.truetype("Corporate-Logo-Rounded-Bold-ver3.otf", 20)
+
+    # 角丸にするためのマスクを作成
+    mask = Image.new("L", img.size, 0)
+    radius = 50
+    draw = ImageDraw.Draw(mask)
+    draw.rounded_rectangle((0, 0, img.width, img.height), radius, fill=255)
+
     draw = ImageDraw.Draw(img)
     
     draw.text((text_x, 0), text, font = font, fill = "#FFFFFF")
@@ -141,16 +148,16 @@ def CreateSalmonImage(jsons, text, text_x, IsBackPaste = True):
         weaponimg = Image.open(io.BytesIO(requests.get(weapon["image"]).content))
         weaponimg = weaponimg.resize((int(weaponimg.size[0] / 2),
                               int(weaponimg.size[1] / 2)))
-        additional = 140
-        img.paste(weaponimg, (40 + additional + (index * 140), 425), weaponimg)
+        additional = 50
+        img.paste(weaponimg, (40 + additional + (index * 190), 425), weaponimg)
         weapontext = weapon["name"]
         if weapontext is not "6e17fbe20efecca9":
             weapontext = GetTranslation("weapons", weapontext)
         else:
             weapontext = ""
-        draw.text((50 + additional + (index * 140), 550), weapontext, font = font_supermini, fill = "#FFFFFF")
+        draw.text((50 + additional + (index * 190), 550), weapontext, font = font_supermini, fill = "#FFFFFF")
         index += 1
-    back.paste(img, (30,10))
+    back.paste(img, (30,10), mask)
     return back
 def GetSalmonoidName(salmonid):
     if salmonid == "Cohozuna":
@@ -171,19 +178,14 @@ def CreateSchImage(jsons, text, text_x, IsBackPaste = True):
     ry = 20
     fillcolor = "#000000"
 
-    font = ImageFont.truetype("Corporate-Logo-Rounded-Bold-ver3.otf", 60)
+    font = ImageFont.truetype("Corporate-Logo-Rounded-Bold-ver3.otf", 55)
 
+    # 角丸にするためのマスクを作成
     mask = Image.new("L", img.size, 0)
+    radius = 50
     draw = ImageDraw.Draw(mask)
-    draw.rectangle((0,ry)+(mask.size[0]-1,mask.size[1]-1-ry), fill=fillcolor)
-    draw.rectangle((rx,0)+(mask.size[0]-1-rx,mask.size[1]-1), fill=fillcolor)
-    draw.pieslice((0,0)+(rx*2,ry*2), 180, 270, fill=fillcolor)
-    draw.pieslice((0,mask.size[1]-1-ry*2)+(rx*2,mask.size[1]-1), 90, 180, fill=fillcolor)
-    draw.pieslice((mask.size[0]-1-rx*2,mask.size[1]-1-ry*2)+
-                  (mask.size[0]-1,mask.size[1]-1), 0, 180, fill=fillcolor)
-    draw.pieslice((mask.size[0]-1-rx*2,0)+
-                 (mask.size[0]-1,ry*2), 270, 360, fill=fillcolor)
-    
+    draw.rounded_rectangle((0, 0, img.width, img.height), radius, fill=255)
+
     im_2 = Image.new(mode=img.mode, size=img.size, color=(0,0,0,0))
     Image.composite(img, im_2, mask)
     
@@ -211,11 +213,12 @@ while True:
     if utcnow.hour <= 21:
         break
     if utcnow.hour == 23 and utcnow.minute >= 0:        #ツイートする
+        
         medias = []
         bankaradata = GetSchedulesData(schjson, "bankara")
         regular = CreateSchImage(GetSchedulesData(schjson, "regular")[0]["settings"][0], "レギュラーマッチ", 120, False)
 
-        bankarachallenge = CreateSchImage(bankaradata[0]["settings"][0], "バンカラマッチ(チャレンジ)", 10, False)
+        bankarachallenge = CreateSchImage(bankaradata[0]["settings"][0], "バンカラマッチ(チャレンジ)", 33, False)
 
         bankaraopen = CreateSchImage(bankaradata[0]["settings"][1], "バンカラマッチ(オープン)", 40, False)
 
@@ -233,10 +236,17 @@ while True:
         back = back.resize((int(back.size[0] * 1.2),
                      int(back.size[1] * 1.2)))
         back = back.crop((0,0,int(back.size[0] / 1.4),back.size[1]))
-        back.paste(regular, (60,20))
-        back.paste(bankaraopen, (580,20))
-        back.paste(bankarachallenge, (1100,20))
-        back.paste(xmatch, (400,650))
+        
+        # 角丸にするためのマスクを作成
+        mask = Image.new("L", bankaraopen.size, 0)
+        radius = 50
+        draw = ImageDraw.Draw(mask)
+        draw.rounded_rectangle((0, 0, bankaraopen.width, bankaraopen.height), radius, fill=255)
+
+        back.paste(regular, (60,20), mask=mask)
+        back.paste(bankaraopen, (580,20),mask=mask)
+        back.paste(bankarachallenge, (1100,20),mask=mask)
+        back.paste(xmatch, (400,650),mask=mask)
         back.save("battle.png")
         
         CreateSalmonImage(GetSalmonData(schjson, "regular")[0],"サーモンラン", 300).save("salmon.png")

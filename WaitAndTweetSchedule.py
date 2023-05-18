@@ -115,6 +115,13 @@ def CreateSalmonImage(jsons, text, text_x, IsBackPaste = True):
     font_chu = ImageFont.truetype("Corporate-Logo-Rounded-Bold-ver3.otf", 45)
     font_mini = ImageFont.truetype("Corporate-Logo-Rounded-Bold-ver3.otf", 30)
     font_supermini = ImageFont.truetype("Corporate-Logo-Rounded-Bold-ver3.otf", 20)
+    
+    # 角丸にするためのマスクを作成
+    mask = Image.new("L", img.size, 0)
+    radius = 50
+    draw = ImageDraw.Draw(mask)
+    draw.rounded_rectangle((0, 0, img.width, img.height), radius, fill=255)
+
     draw = ImageDraw.Draw(img)
     
     draw.text((text_x, 0), text, font = font, fill = "#FFFFFF")
@@ -141,16 +148,16 @@ def CreateSalmonImage(jsons, text, text_x, IsBackPaste = True):
         weaponimg = Image.open(io.BytesIO(requests.get(weapon["image"]).content))
         weaponimg = weaponimg.resize((int(weaponimg.size[0] / 2),
                               int(weaponimg.size[1] / 2)))
-        additional = 140
-        img.paste(weaponimg, (40 + additional + (index * 140), 425), weaponimg)
+        additional = 50
+        img.paste(weaponimg, (40 + additional + (index * 190), 425), weaponimg)
         weapontext = weapon["name"]
         if weapontext is not "6e17fbe20efecca9":
             weapontext = GetTranslation("weapons", weapontext)
         else:
             weapontext = ""
-        draw.text((50 + additional + (index * 140), 550), weapontext, font = font_supermini, fill = "#FFFFFF")
+        draw.text((50 + additional + (index * 190), 550), weapontext, font = font_supermini, fill = "#FFFFFF")
         index += 1
-    back.paste(img, (30,10))
+    back.paste(img, (30,10), mask=mask)
     return back
 def GetSalmonoidName(salmonid):
     if salmonid == "Cohozuna":
@@ -171,19 +178,14 @@ def CreateSchImage(jsons, text, text_x, IsBackPaste = True):
     ry = 20
     fillcolor = "#FFFFFF"
 
-    font = ImageFont.truetype("Corporate-Logo-Rounded-Bold-ver3.otf", 60)
+    font = ImageFont.truetype("Corporate-Logo-Rounded-Bold-ver3.otf", 55)
 
+    # 角丸にするためのマスクを作成
     mask = Image.new("L", img.size, 0)
+    radius = 50
     draw = ImageDraw.Draw(mask)
-    draw.rectangle((0,ry)+(mask.size[0]-1,mask.size[1]-1-ry), fill=fillcolor)
-    draw.rectangle((rx,0)+(mask.size[0]-1-rx,mask.size[1]-1), fill=fillcolor)
-    draw.pieslice((0,0)+(rx*2,ry*2), 180, 270, fill=fillcolor)
-    draw.pieslice((0,mask.size[1]-1-ry*2)+(rx*2,mask.size[1]-1), 90, 180, fill=fillcolor)
-    draw.pieslice((mask.size[0]-1-rx*2,mask.size[1]-1-ry*2)+
-                  (mask.size[0]-1,mask.size[1]-1), 0, 180, fill=fillcolor)
-    draw.pieslice((mask.size[0]-1-rx*2,0)+
-                 (mask.size[0]-1,ry*2), 270, 360, fill=fillcolor)
-    
+    draw.rounded_rectangle((0, 0, img.width, img.height), radius, fill=255)
+
     draw = ImageDraw.Draw(img)
     draw.text((text_x, 0), text, font = font , fill = "#FFFFFF")
     
@@ -200,7 +202,7 @@ def CreateSchImage(jsons, text, text_x, IsBackPaste = True):
     
     del draw
     if IsBackPaste:
-        back.paste(img, (105,10))
+        back.paste(img, (105,10),mask=mask)
         img = back
     return img
 IsTweeted = False
@@ -213,7 +215,7 @@ while True:
         bankaradata = GetSchedulesData(schjson, "bankara")
         CreateSchImage(GetSchedulesData(schjson, "regular")[1]["settings"][0], "レギュラーマッチ", 120).save("regular.png")
 
-        bankaraopen = CreateSchImage(bankaradata[1]["settings"][0], "バンカラマッチ(チャレンジ)", 10, False)
+        bankaraopen = CreateSchImage(bankaradata[1]["settings"][0], "バンカラマッチ(チャレンジ)", 33, False)
         bankarachallenge = CreateSchImage(bankaradata[1]["settings"][1], "バンカラマッチ(オープン)", 40, False)
 
         back = Image.open("SplatoonBack_White.png").crop((0,0,1450,920))
