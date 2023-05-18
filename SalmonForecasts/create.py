@@ -54,6 +54,11 @@ for weapon in weapons:
                     if weaponrange != None:
                         weaponrangetext = weaponrange.group(0).replace("有効射程（インク弾）</th><td rowspan=\"2\" style=\"text-align:center;\">","").replace("</td><th style=","")
                     else:
+                     weaponrange = re.search(r"有効射程（直撃）</th><td style=\"text-align:center;\">(.*?)</td><th style=", weapondata)
+                     if weaponrange != None:
+                        weaponrangetext = weaponrange.group(0).replace("有効射程（直撃）</th><td style=\"text-align:center;\">","").replace("</td><th style=","")
+                     else:
+
                         print("エラーが発生しました。射程")
     newtext += weaponrangetext + ","
     weapondpstext = re.search(r"DPS</th><td style=\"text-align:center;\">(.*?)/秒</td></tr>", weapondata)
