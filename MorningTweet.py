@@ -1,7 +1,7 @@
 import os
 import tweepy
 import requests
-from datetime import datetime
+from datetime import datetime, timedelta
 from PIL import Image, ImageDraw, ImageFont
 import io
 #secretsで設定した値をとる
@@ -135,7 +135,7 @@ def CreateSalmonImage(jsons, text, text_x, IsBackPaste = True):
     if datetime.utcnow() > jsons["start"]:
         starttext = ""
     else:
-        starttext = (jsons["start"] + datetime.timedelta(hours=9)).strftime('%Y年%m月%d日%H時')+"開始"
+        starttext = (jsons["start"] + timedelta(hours=9)).strftime('%Y年%m月%d日%H時')+"開始"
     draw.text((550, 80), starttext, font = font_mini, fill = "#FFFFFF")
 
     #オカシラシャケ

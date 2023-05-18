@@ -1,7 +1,7 @@
 import os
 import tweepy
 import requests
-from datetime import datetime
+from datetime import datetime, timedelta
 from PIL import Image, ImageDraw, ImageFont
 import io
 import time
@@ -135,7 +135,7 @@ def CreateSalmonImage(jsons, text, text_x, IsBackPaste = True):
     if datetime.utcnow() > jsons["start"]:
         starttext = ""
     else:
-        starttext = (jsons["start"] + datetime.timedelta(hours=9)).strftime('%Y年%m月%d日%H時')+"開始"
+        starttext = (jsons["start"] + timedelta(hours=9)).strftime('%Y年%m月%d日%H時')+"開始"
     draw.text((550, 80), starttext, font = font_mini, fill = "#FFFFFF")
 
     #オカシラシャケ
@@ -252,7 +252,7 @@ while True:
             medias.append(api.media_upload(filename="salmonnew.png").media_id)
             tweettext =  "新しいサーモンランのスケジュールが公開されました！\n"
             tweettext += "▼開始日時\n"
-            tweettext += (jsons["start"] + datetime.timedelta(hours=9)).strftime('%Y年%m月%d日%H時')+"\n"
+            tweettext += (jsons["start"] + timedelta(hours=9)).strftime('%Y年%m月%d日%H時')+"\n"
             client.create_tweet(text=tweettext, media_ids = medias)
             break
         time.sleep(30)
