@@ -85,6 +85,10 @@ for weapon in weapons:
                      if weapondpstext != None:
                         weapondps = weapondpstext.group(0).replace("DPS（フルチャージ時間含む）</th><td style=\"text-align:center;\">","").replace("/秒</td></tr>","")
                      else:
+                      weapondpstext = re.search(r"DPS</th><td style=\"text-align:center; width:100px;\">(.*?)/秒</td></tr>", weapondata)
+                      if weapondpstext != None:
+                        weapondps = weapondpstext.group(0).replace("DPS</th><td style=\"text-align:center; width:100px;\">","").replace("/秒</td></tr>","")
+                      else:
                         print("エラーが発生しました。DPS")
     newtext += weapondps + ","
     #インク効率
