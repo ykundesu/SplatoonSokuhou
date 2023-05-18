@@ -218,9 +218,15 @@ while True:
         bankaraopen = CreateSchImage(bankaradata[1]["settings"][0], "バンカラマッチ(チャレンジ)", 33, False)
         bankarachallenge = CreateSchImage(bankaradata[1]["settings"][1], "バンカラマッチ(オープン)", 40, False)
 
+        # 角丸にするためのマスクを作成
+        mask = Image.new("L", bankaraopen.size, 0)
+        radius = 50
+        draw = ImageDraw.Draw(mask)
+        draw.rounded_rectangle((0, 0, bankaraopen.width, bankaraopen.height), radius, fill=255)
+
         back = Image.open("SplatoonBack_White.png").crop((0,0,1450,920))
-        back.paste(bankaraopen, (105,10))
-        back.paste(bankarachallenge, (755,10))
+        back.paste(bankaraopen, (105,10), mask=mask)
+        back.paste(bankarachallenge, (755,10), mask=mask)
         back.save("bankara.png")
         
         CreateSchImage(GetSchedulesData(schjson, "x")[1]["settings"][0], "Xマッチ", 200).save("xmatch.png")
