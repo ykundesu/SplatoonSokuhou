@@ -63,6 +63,7 @@ for weapon in weapons:
                         weaponrangetext = weaponrange.group(0).replace("有効射程（正面の弾）</th><td style=\"text-align:center;\">","").replace("</td><th style=","")
                       else:
                         print("エラーが発生しました。射程")
+                        weaponrangetext = "NoneShatei"
     newtext += weaponrangetext + ","
     weapondpstext = re.search(r"DPS</th><td style=\"text-align:center;\">(.*?)/秒</td></tr>", weapondata)
     if weapondpstext != None:
@@ -93,9 +94,15 @@ for weapon in weapons:
                         weapondps = weapondpstext.group(0).replace("DPS</th><td style=\"text-align:center; width:100px;\">","").replace("/秒</td></tr>","")
                       else:
                         print("エラーが発生しました。DPS")
+                        weapondpstext = "NoneDPS"
     newtext += weapondps + ","
     #インク効率
-    weaponpointtext = re.search(r"インク効率（塗り）</th><td style=\"text-align:center;\">(.*?)p<", weapondata).group(0).replace("インク効率（塗り）</th><td style=\"text-align:center;\">","").replace("p<","")
+    weaponpoint = re.search(r"インク効率（塗り）</th><td style=\"text-align:center;\">(.*?)p<", weapondata)
+    if weaponpoint != None:
+        weaponpointtext = weaponpoint.group(0).replace("インク効率（塗り）</th><td style=\"text-align:center;\">","").replace("p<","")
+    else:
+        print("エラーが発生しました。塗り")
+        weaponpointtext = "NoneNuri"
     newtext += weaponpointtext + ","
     #役割
     yakuwari = input("役割(0:ザコ処理,1:オオモノ処理,2:塗り,3:金イクラ納品,4:すべて):")
