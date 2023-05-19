@@ -230,7 +230,7 @@ def createimage(targetgear):
             #サブパワー
             for addpower in targetgear["addpowers"]:
                 addpowerimg = Image.open(io.BytesIO(requests.get(addpower["img"]).content))
-                addpowerimg = mainpower.resize((int(addpowerimg.size[0] / 1.75),
+                addpowerimg = addpowerimg.resize((int(addpowerimg.size[0] / 1.75),
                                               int(addpowerimg.size[1] / 1.75)))
                 gearback.paste(addpowerimg,(85 + (subindex * 48),157), addpowerimg)
                 subindex += 1
