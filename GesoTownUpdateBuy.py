@@ -204,6 +204,39 @@ def CreateSchImage(jsons, text, text_x, IsBackPaste = True):
         back.paste(img, (105,10))
         img = back
     return img
+def createimage(targetgear):
+            font = ImageFont.truetype("Corporate-Logo-Rounded-Bold-ver3.otf", 30)
+            gearback = img.copy()
+            gearbackdraw = ImageDraw.Draw(gearback)
+            gearimg = Image.open(io.BytesIO(requests.get(targetgear["image"]).content))
+            gearimg = gearimg.resize((int(gearimg.width / 2), int(gearimg.height / 2)))
+            gearback.paste(gearimg, (52,2), gearimg)
+            print("a:"+targetgear["mainpowerimg"])
+            print("b:"+targetgear["brandimage"])
+            brandimg = Image.open(io.BytesIO(requests.get(targetgear["brandimage"]).content))
+            brandimg = brandimg.convert("RGBA")
+            print(brandimg.mode)
+            brandimg = brandimg.resize((int(brandimg.width / 2), int(brandimg.height / 2)))
+            brandback = Image.new('RGBA', (brandimg.size[0], brandimg.size[1]), 'white')
+            gearback.paste(brandback, (180,11))
+            gearback.paste(brandimg, (180,11), brandimg)
+            gearbackdraw.text((0,125),GetTranslation("gear",targetgear["name"]),font=font, fill = "#FFFFFF")
+            #メインパワー
+            mainpower = Image.open(io.BytesIO(requests.get(targetgear["mainpowerimg"]).content))
+            mainpower = mainpower.resize((int(mainpower.size[0] / 1.35),
+                                          int(mainpower.size[1] / 1.45)))
+            gearback.paste(mainpower,(25,150), mainpower)
+            subindex = 0
+            #サブパワー
+            for addpower in targetgear["addpowers"]:
+                addpowerimg = Image.open(io.BytesIO(requests.get(addpower["img"]).content))
+                addpowerimg = mainpower.resize((int(addpowerimg.size[0] / 1.75),
+                                              int(addpowerimg.size[1] / 1.75)))
+                gearback.paste(addpowerimg,(85 + (subindex * 48),157), addpowerimg)
+                subindex += 1
+            gearbackdraw.text((107,210), str(targetgear["price"]), font=font, fill = "#FFFFFF")
+            gearback.paste(gesocoin, (83, 220), gesocoin)
+            return gearback
 while True:
     utcnow = datetime.utcnow()
     if utcnow.hour % 4 is 1 or utcnow.hour % 4 is 2:
@@ -214,7 +247,7 @@ while True:
         for data in schjson["data"]["gesotown"]["limitedGears"]:
             gear = {}
             gear["price"] = int(data.get("price"))
-            gear["end"] = datetime.strptime(sch.get("saleEndTime"), '%Y-%m-%d %H:%M:%S')
+            gear["end"] = datetime.strptime(data.get("saleEndTime"), '%Y-%m-%dT%H:%M:%SZ')
             gear["name"] = data.get("gear",{}).get("__splatoon3ink_id","名前なし")
             gear["mainpower"] = data.get("gear",{}).get("primaryGearPower",{}).get("__splatoon3ink_id","名前なし")
             gear["mainpowerimg"] = data.get("gear",{}).get("primaryGearPower",{}).get("image",{}).get("url")
@@ -224,29 +257,44 @@ while True:
                 addpower["name"] = power.get("__splatoon3ink_id","名前なし")
                 addpower["img"] = power.get("image",{}).get("url")
                 gear["addpowers"].append(addpower)
+            gear["image"] = data.get("gear",{}).get("image",{}).get("url","")
+            gear["brandname"] = data.get("gear",{}).get("brand",{}).get("id","翻訳なし")
+            gear["brandimage"] = data.get("gear",{}).get("brand",{}).get("image",{}).get("url","")
             gears.append(gear)
+        ontargets = gears[:-1]
+
+        font = ImageFont.truetype("Corporate-Logo-Rounded-Bold-ver3.otf", 120)
+    
+        back = Image.open("SplatoonBack_White.png").crop((0,0,1300,800))
+        img = Image.open("SplatoonBack_Black.png").crop((0,0,250,250))
+        gesocoin = Image.open("GesoTownCoin.png")
+        #gesocoin = gesocoin.resize((int(gesocoin.size[0] * 1.2),
+        #                            int(gesocoin.size[1] * 1.2)))
+        # 角丸にするためのマスクを作成
+        mask = Image.new("L", img.size, 0)
+        radius = 35
+        draw = ImageDraw.Draw(mask)
+        draw.rounded_rectangle((0, 0, img.width, img.height), radius, fill=255)
+
+        index = 0
+        for targetgear in ontargets:
+            if targetgear["name"] == "":
+                continue
+            gearback = createimage(targetgear)
+            if index < 3:
+                back.paste(gearback, (450 + (index * 280),75), mask=mask)
+            else:
+                back.paste(gearback, (595 + ((index - 3) * 290),350), mask=mask)
+            index += 1
+        backdraw = ImageDraw.Draw(back)
+        gearbacknew = createimage(gears[-1])
+        back.paste(gearbacknew, (100,250), mask=mask)
+        backdraw.text((25,100),"入荷ギア",font=font, fill = "#000000")
+        back.save("gear.png")
         medias = []
-        back = back.resize((int(back.size[0] * 1.2),
-                     int(back.size[1] * 1.2)))
-        back = back.crop((0,0,int(back.size[0] / 1.4),back.size[1]))
-        back.paste(regular, (60,20))
-        back.paste(bankaraopen, (580,20))
-        back.paste(bankarachallenge, (1100,20))
-        back.paste(xmatch, (400,650))
-        back.save("battle.png")
-        
-        CreateSalmonImage(GetSalmonData(schjson, "regular")[0],"サーモンラン", 300).save("salmon.png")
-        #elif len(schjson["data"]["coopGroupingSchedule"]["teamContestSchedules"]["nodes"]) > 0:
-        medias.append(api.media_upload(filename="battle.png").media_id)
-        medias.append(api.media_upload(filename="salmon.png").media_id)
-        if len(schjson["data"]["coopGroupingSchedule"]["bigRunSchedules"]["nodes"]) > 0:
-            CreateSalmonImage(GetSalmonData(schjson, "bigRun")[0],"ビッグラン", 300).save("bigrun.png")
-            medias.append(api.media_upload(filename="bigrun.png").media_id)
-        elif len(schjson["data"]["coopGroupingSchedule"]["teamContestSchedules"]["nodes"]) > 0:
-            CreateSalmonImage(GetSalmonData(schjson, "bigRun")[0],"バイトチームコンテスト", 280).save("teamcont.png")
-            medias.append(api.media_upload(filename="teamcont.png").media_id)
-        tweettext =  "みなさん、おはようございます！\n"
-        tweettext += "以下が現在のスケジュールです！\n"
-        tweettext += "次のスケジュール変更は1時間後(午前9時)です！"
+        medias.append(api.media_upload(filename="gear.png").media_id)
+        tweettext =  "ゲソタウンが更新されました！\n"
+        tweettext += "現在のストアはこちらです！\n"
+        #tweettext += ""
         client.create_tweet(text=tweettext, media_ids = medias)
         break
