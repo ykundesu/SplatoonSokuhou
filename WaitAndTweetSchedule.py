@@ -258,7 +258,7 @@ while True:
             medias.append(api.media_upload(filename="salmonnew.png").media_id)
             tweettext =  "新しいサーモンランのスケジュールが公開されました！\n"
             tweettext += "▼開始日時\n"
-            tweettext += (jsons["start"] + timedelta(hours=9)).strftime('%Y年%m月%d日%H時')+"\n"
+            tweettext += (salmondata[-1]["start"] + timedelta(hours=9)).strftime('%Y年%m月%d日%H時')+"\n"
             client.create_tweet(text=tweettext, media_ids = medias)
             break
         time.sleep(30)
