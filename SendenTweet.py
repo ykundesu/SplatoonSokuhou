@@ -1,4 +1,5 @@
 import tweepy
+import os
 import random
 #secretsで設定した値をとる
 
