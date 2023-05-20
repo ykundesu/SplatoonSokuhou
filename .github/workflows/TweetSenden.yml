@@ -1,0 +1,54 @@
+name: SplatoonSokuhou Tweet Morning
+
+on:
+
+  schedule:
+
+    - cron: '55 9 * * *'
+    - cron: '55 1 * * *'
+
+  workflow_dispatch:
+
+jobs:
+
+  build:
+
+    env:
+
+      CONSUMER_KEY: ${{ secrets.CK }}
+
+      CONSUMER_SECRET: ${{ secrets.CS }}
+
+      ACCESS_TOKEN: ${{ secrets.AT }}
+
+      ACCESS_SECRET: ${{ secrets.AS }}
+
+    runs-on: ubuntu-latest
+
+    name: SplatoonSokuhou Tweet Senden
+
+    steps:
+
+      - name: Set up Python 3.11
+
+        uses: actions/setup-python@v4
+
+        with:
+
+          python-version: 3.11
+
+      - name: Checkout
+
+        uses: actions/checkout@v3
+
+      - name: Install requirements
+
+        run: |
+
+          pip install -r Schedule-requirements.txt
+
+      - name: Run Tweet Senden
+
+        run: |
+
+          python3 SendenTweet.py
