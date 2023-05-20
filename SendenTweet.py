@@ -31,5 +31,5 @@ client = tweepy.Client(
 
 )
 sendens = []
-sendens.append("このアカウントはスケジュール更新やゲソタウン更新など、n様々な情報をツイートするスプラトゥーンのbotです！/n素早く新情報を伝えるので是非フォローしてください！\n#スプラトゥーン\n#サーモンラン")
+sendens.append("このアカウントはスケジュール更新やゲソタウン更新など、\n様々な情報をツイートするスプラトゥーンのbotです！\n素早く新情報を伝えるので是非フォローしてください！\n#スプラトゥーン\n#サーモンラン")
 client.create_tweet(text=random.choice(sendens))
