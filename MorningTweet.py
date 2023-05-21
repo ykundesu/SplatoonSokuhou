@@ -194,14 +194,14 @@ def CreateSchImage(jsons, text, text_x, IsBackPaste = True):
     
     page = Image.open(io.BytesIO(requests.get(jsons["stages"][0]["image"]).content))
     page = page.resize((int(page.width * 1.25), int(page.height * 1.25)))
-    draw.text((160, 70), GetTranslation("rules", jsons["rule"]), font = font , fill = "#FFFFFF")
+    draw.text((290, 100), GetTranslation("rules", jsons["rule"]), font = font , fill = "#FFFFFF",anchor='mm')
     img.paste(page, (50, 150))
-    draw.text((120, 420), GetTranslation("stages", jsons["stages"][0]["name"]), font = font , fill = "#FFFFFF")
+    draw.text((300, 440), GetTranslation("stages", jsons["stages"][0]["name"]), font = font , fill = "#FFFFFF",anchor='mm')
 
     page = Image.open(io.BytesIO(requests.get(jsons["stages"][1]["image"]).content))
     page = page.resize((int(page.width * 1.25), int(page.height * 1.25)))    
     img.paste(page, (50, 490))
-    draw.text((120, 760), GetTranslation("stages", jsons["stages"][1]["name"]), font = font , fill = "#FFFFFF")
+    draw.text((300, 780), GetTranslation("stages", jsons["stages"][1]["name"]), font = font , fill = "#FFFFFF",anchor='mm')
     
     del draw
     if IsBackPaste:

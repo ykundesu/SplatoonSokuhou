@@ -4,6 +4,7 @@ import requests
 from datetime import datetime
 from PIL import Image, ImageDraw, ImageFont
 import io
+import time
 #secretsで設定した値をとる
 CONSUMER_KEY = os.environ.get('CONSUMER_KEY', "")
 CONSUMER_SECRET = os.environ.get('CONSUMER_SECRET', "")
@@ -230,7 +231,7 @@ def createimage(targetgear):
             #サブパワー
             for addpower in targetgear["addpowers"]:
                 addpowerimg = Image.open(io.BytesIO(requests.get(addpower["img"]).content))
-                addpowerimg = mainpower.resize((int(addpowerimg.size[0] / 1.75),
+                addpowerimg = addpowerimg.resize((int(addpowerimg.size[0] / 1.75),
                                               int(addpowerimg.size[1] / 1.75)))
                 gearback.paste(addpowerimg,(85 + (subindex * 48),157), addpowerimg)
                 subindex += 1
@@ -239,12 +240,13 @@ def createimage(targetgear):
             return gearback
 while True:
     utcnow = datetime.utcnow()
-    if utcnow.hour % 4 is 1 or utcnow.hour % 4 is 2:
+    if utcnow.hour > 1 and utcnow.hour < 23:
         break
-    if utcnow.minute > 0 and utcnow.hour % 4 is 0:
+    if utcnow.hour == 0:
+        time.sleep(1)
         schjson = requests.get("https://splatoon3.ink/data/gear.json").json()
         gears = []
-        for data in schjson["data"]["gesotown"]["limitedGears"]:
+        for data in schjson["data"]["gesotown"]["pickupBrand"]["brandGears"]:
             gear = {}
             gear["price"] = int(data.get("price"))
             gear["end"] = datetime.strptime(data.get("saleEndTime"), '%Y-%m-%dT%H:%M:%SZ')
@@ -261,9 +263,10 @@ while True:
             gear["brandname"] = data.get("gear",{}).get("brand",{}).get("id","翻訳なし")
             gear["brandimage"] = data.get("gear",{}).get("brand",{}).get("image",{}).get("url","")
             gears.append(gear)
-        ontargets = gears[:-1]
-
+            
         font = ImageFont.truetype("Corporate-Logo-Rounded-Bold-ver3.otf", 120)
+        font_mini = ImageFont.truetype("Corporate-Logo-Rounded-Bold-ver3.otf", 60)
+        font_supermini = ImageFont.truetype("Corporate-Logo-Rounded-Bold-ver3.otf", 40)
     
         back = Image.open("SplatoonBack_White.png").crop((0,0,1300,800))
         img = Image.open("SplatoonBack_Black.png").crop((0,0,250,250))
@@ -277,24 +280,47 @@ while True:
         draw.rounded_rectangle((0, 0, img.width, img.height), radius, fill=255)
 
         index = 0
-        for targetgear in ontargets:
+        for targetgear in gears:
             if targetgear["name"] == "":
                 continue
             gearback = createimage(targetgear)
-            if index < 3:
-                back.paste(gearback, (450 + (index * 280),75), mask=mask)
-            else:
-                back.paste(gearback, (595 + ((index - 3) * 290),350), mask=mask)
+            #if index < 3:
+            back.paste(gearback, (250 + (index * 280),380), mask=mask)
+            #else:
+            #    back.paste(gearback, (595 + ((index - 3) * 290),350), mask=mask)
             index += 1
         backdraw = ImageDraw.Draw(back)
-        gearbacknew = createimage(gears[-1])
-        back.paste(gearbacknew, (100,250), mask=mask)
-        backdraw.text((25,100),"入荷ギア",font=font, fill = "#000000")
-        back.save("gear.png")
+        #gearbacknew = createimage(gears[-1])
+        #back.paste(gearbacknew, (100,250), mask=mask)
+        backdraw.text((250,25),"本日のピックアップ",font=font, fill = "#000000")
+        brandimage = Image.open(io.BytesIO(requests.get(schjson["data"]["gesotown"]["pickupBrand"]["brandGears"][0]["gear"]["brand"]["image"]["url"]).content)).convert("RGBA")
+        brandimage = brandimage.resize((int(brandimage.size[0] * 1.5),
+                                        int(brandimage.size[1] * 1.5)))
+        back.paste(brandimage,(270,140), brandimage)
+        
+        brandimage = Image.open(io.BytesIO(requests.get(schjson["data"]["gesotown"]["pickupBrand"]["brand"]["usualGearPower"]["image"]["url"]).content)).convert("RGBA")
+        brandimage = brandimage.resize((int(brandimage.size[0] * 1.5),
+                                        int(brandimage.size[1] * 1.5)))
+        back.paste(brandimage,(680,170), brandimage)
+
+        brandimage = Image.open(io.BytesIO(requests.get(schjson["data"]["gesotown"]["pickupBrand"]["image"]["url"]).content))
+        brandimage = brandimage.resize((int(brandimage.size[0] / 5),
+                                        int(brandimage.size[1] / 5)))
+        mask2 = Image.new("L", brandimage.size, 0)
+        radius = 35
+        draw2 = ImageDraw.Draw(mask2)
+        draw2.rounded_rectangle((0, 0, brandimage.width, brandimage.height), radius, fill=255)
+
+        back.paste(brandimage,(500,640),mask=mask2)
+        
+        backdraw.text((360,330),GetTranslation("brands",schjson["data"]["gesotown"]["pickupBrand"]["brand"]["id"]),font=font_mini, fill = "#000000",anchor='mm')
+        backdraw.text((750,170),"つきやすいギアパワー",font=font_supermini, fill = "#000000",anchor='mm')
+        backdraw.text((750,330),GetTranslation("powers",schjson["data"]["gesotown"]["pickupBrand"]["brand"]["usualGearPower"]["__splatoon3ink_id"]),font=font_mini, fill = "#000000",anchor='mm')
+        back.save("pickupgear.png")
         medias = []
-        medias.append(api.media_upload(filename="gear.png").media_id)
+        #medias.append(api.media_upload(filename="pickupgear.png").media_id)
         tweettext =  "ゲソタウンが更新されました！\n"
         tweettext += "現在のストアはこちらです！\n"
         #tweettext += ""
-        client.create_tweet(text=tweettext, media_ids = medias)
+        #client.create_tweet(text=tweettext, media_ids = medias)
         break
