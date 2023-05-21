@@ -1,0 +1,4 @@
+﻿tweepy
+requests
+deta
+beautifulsoup4
