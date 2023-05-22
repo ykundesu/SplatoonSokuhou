@@ -1,4 +1,4 @@
-﻿name: SplatoonSokuhou Tweet GesoTown
+﻿name: SplatoonSokuhou Tweet GesoTown Pickup
 
 on:
   schedule:
@@ -13,7 +13,7 @@ jobs:
       ACCESS_TOKEN: ${{ secrets.AT }}
       ACCESS_SECRET: ${{ secrets.AS }}
     runs-on: ubuntu-latest
-    name: SplatoonSokuhou Tweet GesoTown
+    name: SplatoonSokuhou Tweet GesoTown Pickup
     steps:
       - name: Set up Python 3.11
         uses: actions/setup-python@v4
@@ -24,6 +24,6 @@ jobs:
       - name: Install requirements
         run: |
           pip install -r Schedule-requirements.txt
-      - name: Run Tweet GesoTown
+      - name: Run Tweet GesoTown Pickup
         run: |
           python3 GesoTownUpdatePickup.py
