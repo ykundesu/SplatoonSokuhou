@@ -318,9 +318,9 @@ while True:
         backdraw.text((750,330),GetTranslation("powers",schjson["data"]["gesotown"]["pickupBrand"]["brand"]["usualGearPower"]["__splatoon3ink_id"]),font=font_mini, fill = "#000000",anchor='mm')
         back.save("pickupgear.png")
         medias = []
-        #medias.append(api.media_upload(filename="pickupgear.png").media_id)
-        tweettext =  "ゲソタウンが更新されました！\n"
-        tweettext += "現在のストアはこちらです！\n"
-        #tweettext += ""
-        #client.create_tweet(text=tweettext, media_ids = medias)
+        medias.append(api.media_upload(filename="pickupgear.png").media_id)
+        tweettext =  "ゲソタウンのピックアップが更新されました！\n"
+        tweettext += "現在のピックアップはこちらです！\n"
+        tweettext += "次回の更新は1日後です！"
+        client.create_tweet(text=tweettext, media_ids = medias)
         break
