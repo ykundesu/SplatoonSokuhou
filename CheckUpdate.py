@@ -17,7 +17,6 @@ while True:
         print("終了時間だったので終了")
         sys.exit()
     elif utcnow.hour == 22 or utcnow.minute > 20:
-        print("時間が7時か20分以降だったのでパス。")
         continue
     print("アクセス中...")
     targeturl = re.search("URL=(.*?).html", requests.get("https://www.nintendo.co.jp/support/switch/software_support/av5ja/").text).group(0).replace("URL=","")
@@ -27,7 +26,6 @@ while True:
         break
     print("最新バージョンがなかったので、待機を行います。")
     time.sleep(30)
-    print("待機が終了しました。")
 #print(splatoonurl + targeturl)
 response = requests.get(splatoonurl + targeturl)
 response.encoding = "utf-8"
