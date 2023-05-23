@@ -19,8 +19,8 @@ if lastquiz is not None:
     lastquizanswer = lastquiz["answer"]
     lastquizanswerimg = lastquiz["answerimg"]
 utcnow = datetime.utcnow()
-if utcnow.hour != 14 and utcnow.hour != 15 and utcnow.hour != 2 and utcnow.hour != 3:
-    sys.exit()
+#if utcnow.hour != 14 and utcnow.hour != 15 and utcnow.hour != 2 and utcnow.hour != 3:
+#    sys.exit()
 QuizTypes = ["このブキの名前はなにだろう？",
              "このブキのサブはなんだ？",
              "このブキのスペシャルは何？",
@@ -81,12 +81,16 @@ elif quiztype==3:
     quizweaponname = None
     answerimage = targetweapon["specialWeapon"]["image"]
     Options.append(answer)
-    weapons.remove(targetweapon)
+    specials = []
+    for ws in weapons:
+        if not (ws["specialWeapon"]["name"] in specials):
+            specials.append(ws["specialWeapon"]["name"])
+    specials.remove(targetweapon["specialWeapon"]["name"])
     for index in range(3):
-        randomweaponindex = random.choice(range(len(weapons)))
-        randomweapon = weapons[randomweaponindex]
-        weapons.remove(randomweapon)
-        Options.append(randomweapon["specialWeapon"]["name"])
+        randomweaponindex = random.choice(range(len(specials)))
+        randomweapon = specials[randomweaponindex]
+        specials.remove(randomweapon)
+        Options.append(randomweapon)
 elif quiztype==4:
     targetweaponindex = random.choice(range(len(weapons)))
     targetweapon = weapons[targetweaponindex]
@@ -95,12 +99,16 @@ elif quiztype==4:
     quizweaponname = None
     answerimage = targetweapon["subWeapon"]["image"]
     Options.append(answer)
-    weapons.remove(targetweapon)
+    specials = []
+    for ws in weapons:
+        if not (ws["subWeapon"]["name"] in specials):
+            specials.append(ws["subWeapon"]["name"])
+    specials.remove(targetweapon["subWeapon"]["name"])
     for index in range(3):
-        randomweaponindex = random.choice(range(len(weapons)))
-        randomweapon = weapons[randomweaponindex]
-        weapons.remove(randomweapon)
-        Options.append(randomweapon["subWeapon"]["name"])
+        randomweaponindex = random.choice(range(len(specials)))
+        randomweapon = specials[randomweaponindex]
+        specials.remove(randomweapon)
+        Options.append(randomweapon)
 random.shuffle(Options)
 #print(answer)
 #print(Options)
@@ -169,8 +177,8 @@ if lastquizid is not None:
     #with open("splatoonquizanswer.png",mode="wb") as f:
     #    f.write(requests.get(lastquizanswerimg).content)
 while True:
-    utcnow = datetime.utcnow()
-    if utcnow.hour == 15 or utcnow.hour == 3:
+        utcnow = datetime.utcnow()
+    #if utcnow.hour == 15 or utcnow.hour == 3:
         medias = []
         medias.append(api.media_upload(filename="splatoonquiz.png").media_id)
         tweetid = client.create_tweet(text=tweettext, media_ids = medias).data["id"]
