@@ -191,6 +191,5 @@ while True:
         tweettext = "▼回答はこちら"
         tweetidquiz = client.create_tweet(text=tweettext,in_reply_to_tweet_id=tweetid,poll_duration_minutes=60*12,poll_options=Options).data["id"]
         statusdb.put({"tweetid":tweetidquiz,
-                      "answer":answer,
-                      "answerimg":answerimage},"lastquiz")
+                      "answer":answer},"lastquiz")
         break
