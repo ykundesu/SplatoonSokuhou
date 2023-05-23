@@ -1,0 +1,58 @@
+name: SplatoonSokuhou Tweet Senden
+
+on:
+
+  schedule:
+
+    - cron: '5 2 * * *'
+    - cron: '5 14 * * *'
+
+  workflow_dispatch:
+
+jobs:
+
+  build:
+
+    env:
+
+      CONSUMER_KEY: ${{ secrets.CK }}
+
+      CONSUMER_SECRET: ${{ secrets.CS }}
+
+      ACCESS_TOKEN: ${{ secrets.AT }}
+
+      ACCESS_SECRET: ${{ secrets.AS }}
+
+      SPSOKUHOU_DETA: ${{ secrets.SSD }}
+
+      SESSIONTOKEN: ${{ secrets.ST }}
+
+    runs-on: ubuntu-latest
+
+    name: SplatoonSokuhou Tweet Senden
+
+    steps:
+
+      - name: Set up Python 3.11
+
+        uses: actions/setup-python@v4
+
+        with:
+
+          python-version: 3.11
+
+      - name: Checkout
+
+        uses: actions/checkout@v3
+
+      - name: Install requirements
+
+        run: |
+
+          pip install -r CheckUpdate-requirements.txt
+
+      - name: Run SplatoonQuiz
+
+        run: |
+
+          python3 SplatoonQuiz.py

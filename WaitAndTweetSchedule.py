@@ -213,7 +213,8 @@ while True:
     if utcnow.minute >= 50 and not IsTweeted:        #ツイートする
         medias = []
         bankaradata = GetSchedulesData(schjson, "bankara")
-        CreateSchImage(GetSchedulesData(schjson, "regular")[1]["settings"][0], "レギュラーマッチ", 120).save("regular.png")
+        regulardata = GetSchedulesData(schjson, "regular")
+        CreateSchImage(regulardata[1]["settings"][0], "レギュラーマッチ", 120).save("regular.png")
 
         bankaraopen = CreateSchImage(bankaradata[1]["settings"][0], "バンカラマッチ(チャレンジ)", 33, False)
         bankarachallenge = CreateSchImage(bankaradata[1]["settings"][1], "バンカラマッチ(オープン)", 40, False)
@@ -228,8 +229,9 @@ while True:
         back.paste(bankaraopen, (105,10), mask=mask)
         back.paste(bankarachallenge, (755,10), mask=mask)
         back.save("bankara.png")
-        
-        CreateSchImage(GetSchedulesData(schjson, "x")[1]["settings"][0], "Xマッチ", 200).save("xmatch.png")
+
+        xmatchdata = GetSchedulesData(schjson, "x")
+        CreateSchImage(xmatchdata[1]["settings"][0], "Xマッチ", 200).save("xmatch.png")
         salmondata = GetSalmonData(schjson, "regular")
         medias.append(api.media_upload(filename="regular.png").media_id)
         medias.append(api.media_upload(filename="bankara.png").media_id)
@@ -243,7 +245,20 @@ while True:
         hourtime = utcnow.hour + 1 + 9
         if hourtime >= 24:
             hourtime -= 24
-        tweettext += str(hourtime) + "時からのスケジュールです！"
+        tweettext += str(hourtime) + "時からのスケジュールです！\n"
+        
+        tweettext += "・レギュラーマッチ\n=>ナワバリバトル\n"
+        #tweettext += GetTranslation("stages", regulardata[1]["settings"][0]["stages"][0]["name"])+"、"+GetTranslation("stages", regulardata[1]["settings"][0]["stages"][1]["name"])+"\n"
+        
+        tweettext += "・バンカラマッチ(オープン)\n=>"+GetTranslation("rules", bankaradata[1]["settings"][0]["rule"])+"\n"
+        #tweettext += GetTranslation("stages", bankaradata[1]["settings"][0]["stages"][0]["name"])+"、"+GetTranslation("stages", bankaradata[1]["settings"][0]["stages"][1]["name"])+"\n"
+        
+        tweettext += "・バンカラマッチ(チャレンジ)\n=>"+GetTranslation("rules", bankaradata[1]["settings"][1]["rule"])+"\n"
+        #tweettext += GetTranslation("stages", bankaradata[1]["settings"][1]["stages"][0]["name"])+"、"+GetTranslation("stages", bankaradata[1]["settings"][1]["stages"][1]["name"])+"\n"
+
+        tweettext += "・Xマッチ\n=>"+GetTranslation("rules", xmatchdata[1]["settings"][0]["rule"])+"\n"
+        #tweettext += GetTranslation("stages", xmatchdata[1]["settings"][0]["stages"][0]["name"])+"、"+GetTranslation("stages", xmatchdata[1]["settings"][0]["stages"][1]["name"])+"\n"
+                
         client.create_tweet(text=tweettext, media_ids = medias)
         IsTweeted = True
         if isbreak:
@@ -259,6 +274,13 @@ while True:
             tweettext =  "新しいサーモンランのスケジュールが公開されました！\n"
             tweettext += "▼開始日時\n"
             tweettext += (salmondata[-1]["start"] + timedelta(hours=9)).strftime('%Y年%m月%d日%H時')+"\n"
+            tweettext += "▼ステージ\n"
+            tweettext += GetTranslation("stages", salmondata[-1]["stagename"])
+            tweettext += "▼ブキ\n"
+            for weapon in salmondata[-1]["weapons"]:
+                weapontext = weapon["name"]
+                weapontext = GetTranslation("weapons", weapontext)
+                tweettext += "・" + weapontext + "\n"
             client.create_tweet(text=tweettext, media_ids = medias)
             break
         time.sleep(30)
