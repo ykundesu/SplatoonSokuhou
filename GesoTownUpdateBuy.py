@@ -4,6 +4,7 @@ import requests
 from datetime import datetime
 from PIL import Image, ImageDraw, ImageFont
 import io
+import time
 #secretsで設定した値をとる
 CONSUMER_KEY = os.environ.get('CONSUMER_KEY', "")
 CONSUMER_SECRET = os.environ.get('CONSUMER_SECRET', "")
@@ -241,7 +242,8 @@ while True:
     utcnow = datetime.utcnow()
     if utcnow.hour % 4 is 1 or utcnow.hour % 4 is 2:
         break
-    if utcnow.minute > 0 and utcnow.hour % 4 is 0:
+    if utcnow.hour % 4 is 0:
+        time.sleep(1)
         schjson = requests.get("https://splatoon3.ink/data/gear.json").json()
         gears = []
         for data in schjson["data"]["gesotown"]["limitedGears"]:
