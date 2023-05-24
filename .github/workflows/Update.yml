@@ -1,0 +1,36 @@
+﻿name: SplatoonSokuhou Update Task
+
+on:
+  schedule:
+    - cron: '47 0 * * *'
+    - cron: '47 4 * * *'
+    - cron: '47 8 * * *'
+    - cron: '47 12 * * *'
+    - cron: '47 16 * * *'
+    - cron: '47 20 * * *'
+  workflow_dispatch:
+
+jobs:
+  build:
+    env:
+      CONSUMER_KEY: ${{ secrets.CK }}
+      CONSUMER_SECRET: ${{ secrets.CS }}
+      ACCESS_TOKEN: ${{ secrets.AT }}
+      ACCESS_SECRET: ${{ secrets.AS }}
+      SPSOKUHOU_DETA: ${{ secrets.SSD }}
+      YOUTUBEAPIKEY: ${{ secrets.YAK }}
+    runs-on: ubuntu-latest
+    name: SplatoonSokuhou Check Update
+    steps:
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install requirements
+        run: |
+          pip install -r update-req.txt
+      - name: Run Update Task
+        run: |
+          python3 update.py
