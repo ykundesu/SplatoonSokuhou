@@ -15,6 +15,7 @@ NSOAPP_VER_FALLBACK   = "2.5.0"
 WEB_VIEW_VERSION      = "unknown"
 session = requests.Session()
 def get_nsoapp_version():
+ return "2.5.1"
 	'''Fetches the current Nintendo Switch Online app version from the Apple App Store and sets it globally.'''
 
 	if USE_OLD_NSOAPP_VER:
