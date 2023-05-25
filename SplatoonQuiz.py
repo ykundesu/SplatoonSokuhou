@@ -17,7 +17,6 @@ lastquizanswerimg = None
 if lastquiz is not None:
     lastquizid = lastquiz["tweetid"]
     lastquizanswer = lastquiz["answer"]
-    lastquizanswerimg = lastquiz["answerimg"]
 utcnow = datetime.utcnow()
 #if utcnow.hour != 14 and utcnow.hour != 15 and utcnow.hour != 2 and utcnow.hour != 3:
 #    sys.exit()

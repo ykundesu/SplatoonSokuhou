@@ -15,7 +15,6 @@ NSOAPP_VER_FALLBACK   = "2.5.0"
 WEB_VIEW_VERSION      = "unknown"
 session = requests.Session()
 def get_nsoapp_version():
-	return "2.5.1"
 	'''Fetches the current Nintendo Switch Online app version from the Apple App Store and sets it globally.'''
 
 	if USE_OLD_NSOAPP_VER:
@@ -300,7 +299,7 @@ def call_f_api(id_token, step, f_gen_url):
 			'hash_method':  step
 		}
 		api_response = requests.post(f_gen_url, data=json.dumps(api_body), headers=api_head)
-		resp = json.loads(api_response.text)
+		resp = api_response.json()
 
 		f = resp["f"]
 		uuid = resp["request_id"]
