@@ -8,15 +8,6 @@ import sys
 from PIL import Image, ImageDraw, ImageFont
 from datetime import datetime
 from deta import Deta
-statusdb = Deta(os.environ.get('SPSOKUHOU_DETA', "")).Base("SSStatus")
-lastquiz = statusdb.get("lastquiz")
-
-lastquizid = None
-lastquizanswer = None
-lastquizanswerimg = None
-if lastquiz is not None:
-    lastquizid = lastquiz["tweetid"]
-    lastquizanswer = lastquiz["answer"]
 utcnow = datetime.utcnow()
 if utcnow.hour != 14 and utcnow.hour != 15 and utcnow.hour != 2 and utcnow.hour != 3:
     sys.exit()
@@ -178,6 +169,14 @@ if lastquizid is not None:
 while True:
     utcnow = datetime.utcnow()
     if utcnow.hour == 15 or utcnow.hour == 3:
+        statusdb = Deta(os.environ.get('SPSOKUHOU_DETA', "")).Base("SSStatus")
+        lastquiz = statusdb.get("lastquiz")
+
+        lastquizid = None
+        lastquizanswer = None
+        if lastquiz is not None:
+         lastquizid = lastquiz["tweetid"]
+         lastquizanswer = lastquiz["answer"]
         medias = []
         medias.append(api.media_upload(filename="splatoonquiz.png").media_id)
         tweetid = client.create_tweet(text=tweettext, media_ids = medias).data["id"]
