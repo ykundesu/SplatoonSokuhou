@@ -18,8 +18,8 @@ if lastquiz is not None:
     lastquizid = lastquiz["tweetid"]
     lastquizanswer = lastquiz["answer"]
 utcnow = datetime.utcnow()
-#if utcnow.hour != 14 and utcnow.hour != 15 and utcnow.hour != 2 and utcnow.hour != 3:
-#    sys.exit()
+if utcnow.hour != 14 and utcnow.hour != 15 and utcnow.hour != 2 and utcnow.hour != 3:
+    sys.exit()
 QuizTypes = ["このブキの名前はなんなのだろう？",
              "このブキのサブはなんだ？",
              "このブキのスペシャルは何？",
@@ -176,8 +176,8 @@ if lastquizid is not None:
     #with open("splatoonquizanswer.png",mode="wb") as f:
     #    f.write(requests.get(lastquizanswerimg).content)
 while True:
-    #utcnow = datetime.utcnow()
-    #if utcnow.hour == 15 or utcnow.hour == 3:
+    utcnow = datetime.utcnow()
+    if utcnow.hour == 15 or utcnow.hour == 3:
         medias = []
         medias.append(api.media_upload(filename="splatoonquiz.png").media_id)
         tweetid = client.create_tweet(text=tweettext, media_ids = medias).data["id"]
