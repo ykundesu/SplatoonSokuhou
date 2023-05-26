@@ -9,8 +9,8 @@ from PIL import Image, ImageDraw, ImageFont
 from datetime import datetime
 from deta import Deta
 utcnow = datetime.utcnow()
-if utcnow.hour != 14 and utcnow.hour != 15 and utcnow.hour != 2 and utcnow.hour != 3:
-    sys.exit()
+#if utcnow.hour != 14 and utcnow.hour != 15 and utcnow.hour != 2 and utcnow.hour != 3:
+#    sys.exit()
 QuizTypes = ["このブキの名前はなんなのだろう？",
              "このブキのサブはなんだ？",
              "このブキのスペシャルは何？",
@@ -160,15 +160,11 @@ tweettext += QuizTypes[quiztype]+"\n"
 tweettext += "答え合わせは"+kotaeawase+"です！"
 tweettext += "回答は返信にある投票から！\n"
 tweettext += "#スプラトゥーンクイズ"
-if lastquizid is not None:
-    tweettextanswer =  "このクイズの正解は...\n"
-    tweettextanswer += lastquizanswer+"！\n"
-    tweettextanswer += "みんなは正解できたかな？\n▼次のクイズはこちら！\n"
     #with open("splatoonquizanswer.png",mode="wb") as f:
     #    f.write(requests.get(lastquizanswerimg).content)
 while True:
-    utcnow = datetime.utcnow()
-    if utcnow.hour == 15 or utcnow.hour == 3:
+    #utcnow = datetime.utcnow()
+    #if utcnow.hour == 15 or utcnow.hour == 3:
         statusdb = Deta(os.environ.get('SPSOKUHOU_DETA', "")).Base("SSStatus")
         lastquiz = statusdb.get("lastquiz")
 
@@ -177,6 +173,10 @@ while True:
         if lastquiz is not None:
          lastquizid = lastquiz["tweetid"]
          lastquizanswer = lastquiz["answer"]
+	if lastquizid is not None:
+         tweettextanswer =  "このクイズの正解は...\n"
+         tweettextanswer += lastquizanswer+"！\n"
+         tweettextanswer += "みんなは正解できたかな？\n▼次のクイズはこちら！\n"
         medias = []
         medias.append(api.media_upload(filename="splatoonquiz.png").media_id)
         tweetid = client.create_tweet(text=tweettext, media_ids = medias).data["id"]
