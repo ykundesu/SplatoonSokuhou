@@ -9,8 +9,8 @@ from PIL import Image, ImageDraw, ImageFont
 from datetime import datetime
 from deta import Deta
 utcnow = datetime.utcnow()
-#if utcnow.hour != 14 and utcnow.hour != 15 and utcnow.hour != 2 and utcnow.hour != 3:
-#    sys.exit()
+if utcnow.hour != 14 and utcnow.hour != 15 and utcnow.hour != 2 and utcnow.hour != 3:
+    sys.exit()
 QuizTypes = ["このブキの名前はなんなのだろう？",
              "このブキのサブはなんだ？",
              "このブキのスペシャルは何？",
@@ -163,8 +163,8 @@ tweettext += "#スプラトゥーンクイズ"
     #with open("splatoonquizanswer.png",mode="wb") as f:
     #    f.write(requests.get(lastquizanswerimg).content)
 while True:
-    #utcnow = datetime.utcnow()
-    #if utcnow.hour == 15 or utcnow.hour == 3:
+    utcnow = datetime.utcnow()
+    if utcnow.hour == 15 or utcnow.hour == 3:
         statusdb = Deta(os.environ.get('SPSOKUHOU_DETA', "")).Base("SSStatus")
         lastquiz = statusdb.get("lastquiz")
 
