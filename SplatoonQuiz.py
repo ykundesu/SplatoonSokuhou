@@ -174,9 +174,9 @@ while True:
          lastquizid = lastquiz["tweetid"]
          lastquizanswer = lastquiz["answer"]
 	if lastquizid is not None:
-         tweettextanswer =  "このクイズの正解は...\n"
-         tweettextanswer += lastquizanswer+"！\n"
-         tweettextanswer += "みんなは正解できたかな？\n▼次のクイズはこちら！\n"
+		tweettextanswer =  "このクイズの正解は...\n"
+		tweettextanswer += lastquizanswer+"！\n"
+		tweettextanswer += "みんなは正解できたかな？\n▼次のクイズはこちら！\n"
         medias = []
         medias.append(api.media_upload(filename="splatoonquiz.png").media_id)
         tweetid = client.create_tweet(text=tweettext, media_ids = medias).data["id"]
