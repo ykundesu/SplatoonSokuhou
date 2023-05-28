@@ -243,7 +243,7 @@ while True:
     if utcnow.hour > 1 and utcnow.hour < 23:
         break
     if utcnow.hour == 0:
-        time.sleep(1)
+        time.sleep(6)
         schjson = requests.get("https://splatoon3.ink/data/gear.json").json()
         gears = []
         for data in schjson["data"]["gesotown"]["pickupBrand"]["brandGears"]:
