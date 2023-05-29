@@ -45,10 +45,14 @@ elif quiztype==1:
     Options.append(answer)
     weapons.remove(targetweapon)
     for index in range(3):
-        randomweaponindex = random.choice(range(len(weapons)))
-        randomweapon = weapons[randomweaponindex]
-        weapons.remove(randomweapon)
-        Options.append(randomweapon["subWeapon"]["name"])
+        while True:
+            randomweaponindex = random.choice(range(len(weapons)))
+            randomweapon = weapons[randomweaponindex]
+            if randomweapon["subWeapon"]["name"] in Options:
+                continue
+            weapons.remove(randomweapon)
+            Options.append(randomweapon["subWeapon"]["name"])
+            break
 elif quiztype==2:
     targetweaponindex = random.choice(range(len(weapons)))
     targetweapon = weapons[targetweaponindex]
@@ -59,10 +63,14 @@ elif quiztype==2:
     Options.append(answer)
     weapons.remove(targetweapon)
     for index in range(3):
-        randomweaponindex = random.choice(range(len(weapons)))
-        randomweapon = weapons[randomweaponindex]
-        weapons.remove(randomweapon)
-        Options.append(randomweapon["specialWeapon"]["name"])
+        while True:
+            randomweaponindex = random.choice(range(len(weapons)))
+            randomweapon = weapons[randomweaponindex]
+            if randomweapon["specialWeapon"]["name"] in Options:
+                continue
+            weapons.remove(randomweapon)
+            Options.append(randomweapon["specialWeapon"]["name"])
+            break
 elif quiztype==3:
     targetweaponindex = random.choice(range(len(weapons)))
     targetweapon = weapons[targetweaponindex]
@@ -71,16 +79,15 @@ elif quiztype==3:
     quizweaponname = None
     answerimage = targetweapon["specialWeapon"]["image"]
     Options.append(answer)
-    specials = []
-    for ws in weapons:
-        if not (ws["specialWeapon"]["name"] in specials):
-            specials.append(ws["specialWeapon"]["name"])
-    specials.remove(targetweapon["specialWeapon"]["name"])
     for index in range(3):
-        randomweaponindex = random.choice(range(len(specials)))
-        randomweapon = specials[randomweaponindex]
-        specials.remove(randomweapon)
-        Options.append(randomweapon)
+        while True:
+            randomweaponindex = random.choice(range(len(weapons)))
+            randomweapon = weapons[randomweaponindex]
+            if randomweapon["specialWeapon"]["name"] in Options:
+                continue
+            weapons.remove(randomweapon)
+            Options.append(randomweapon["specialWeapon"]["name"])
+            break
 elif quiztype==4:
     targetweaponindex = random.choice(range(len(weapons)))
     targetweapon = weapons[targetweaponindex]
@@ -89,16 +96,15 @@ elif quiztype==4:
     quizweaponname = None
     answerimage = targetweapon["subWeapon"]["image"]
     Options.append(answer)
-    specials = []
-    for ws in weapons:
-        if not (ws["subWeapon"]["name"] in specials):
-            specials.append(ws["subWeapon"]["name"])
-    specials.remove(targetweapon["subWeapon"]["name"])
     for index in range(3):
-        randomweaponindex = random.choice(range(len(specials)))
-        randomweapon = specials[randomweaponindex]
-        specials.remove(randomweapon)
-        Options.append(randomweapon)
+        while True:
+            randomweaponindex = random.choice(range(len(weapons)))
+            randomweapon = weapons[randomweaponindex]
+            if randomweapon["specialWeapon"]["name"] in Options:
+                continue
+            weapons.remove(randomweapon)
+            Options.append(randomweapon["specialWeapon"]["name"])
+            break
 random.shuffle(Options)
 #print(answer)
 #print(Options)
