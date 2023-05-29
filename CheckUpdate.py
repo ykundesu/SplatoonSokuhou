@@ -11,23 +11,50 @@ statusdb = Deta(os.environ.get('SPSOKUHOU_DETA', "")).Base("SSStatus")
 ver_saisin = statusdb.get("Version")
 print("現在のバージョンは"+ver_saisin["value"]+"です。")
 splatoonurl = "https://www.nintendo.co.jp/support/switch/software_support/av5ja/"
-while True:
-    utcnow = datetime.utcnow()
-    if utcnow.hour > 1 and utcnow.hour < 22:
-        print("終了時間だったので終了")
-        sys.exit()
-    elif utcnow.hour == 22 or utcnow.minute > 20:
-        continue
-    print("アクセス中...")
-    targeturl = re.search("URL=(.*?).html", requests.get("https://www.nintendo.co.jp/support/switch/software_support/av5ja/").text).group(0).replace("URL=","")
-    print("アクセスしました。urlは"+targeturl+"でした。")
-    if targeturl != ver_saisin["value"]:
-        print("最新バージョンがあったので、処理を行います。")
-        break
-    print("最新バージョンがなかったので、待機を行います。")
-    time.sleep(30)
+print(requests.get(splatoonurl).text)
+KAKUTEIVERSION = "400"
+if KAKUTEIVERSION in ver_saisin["value"]:
+    VERSION_KAKUTEI = False
+else:
+    #バージョンが確定しているか(例えばシーズン変更時など)
+    VERSION_KAKUTEI = True
+if not VERSION_KAKUTEI:
+    while True:
+        utcnow = datetime.utcnow()
+        if utcnow.hour > 1 and utcnow.hour < 22:
+            print("終了時間だったので終了")
+            sys.exit()
+        elif utcnow.hour == 22 or utcnow.minute > 20:
+            continue
+        print("アクセス中...")
+        targeturl = re.search("URL=(.*?).html", requests.get("https://www.nintendo.co.jp/support/switch/software_support/av5ja/").text).group(0).replace("URL=","")
+        print("アクセスしました。urlは"+targeturl+"でした。")
+        if targeturl != ver_saisin["value"]:
+            print("最新バージョンがあったので、処理を行います。")
+            response = requests.get(splatoonurl + targeturl)
+            break
+        print("最新バージョンがなかったので、待機を行います。")
+        time.sleep(30)
+else:
+    while True:
+        utcnow = datetime.utcnow()
+        if utcnow.hour > 1 and utcnow.hour < 22:
+            print("確定：終了時間だったので終了")
+            sys.exit()
+        elif utcnow.hour == 22 or utcnow.minute > 20:
+            continue
+        print("アクセス中...")
+        response = requests.get("https://www.nintendo.co.jp/support/switch/software_support/av5ja/"+KAKUTEIVERSION+".html")
+        if response.status_code == 404:
+            print("最新バージョンがなかったので、待機を行います。")
+        else:
+            print("最新バージョンがあったので、処理を行います。")
+            break
+        if utcnow.hour == 23:
+            time.sleep(30)
+        else:
+            time.sleep(10)
 #print(splatoonurl + targeturl)
-response = requests.get(splatoonurl + targeturl)
 response.encoding = "utf-8"
 reversion = re.search("Ver. (.*?) ",response.text).group(0)
 version = reversion.replace("Ver. ", "").replace(" ","")
@@ -213,4 +240,7 @@ else:
         tweetid = tweet(text=tweettext, in_reply_to_tweet_id=tweetid)
 print("バグ数:"+str(bugcount))
 #tweetid = client.create_tweet(text=tweettext, in_reply_to_tweet_id=tweetid).data["id"]
-statusdb.put(targeturl,"Version")
+if VERSION_KAKUTEI:
+    statusdb.put("./"+KAKUTEIVERSION+".html","Version")
+else:
+    statusdb.put(targeturl,"Version")
