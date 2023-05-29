@@ -240,6 +240,7 @@ else:
         tweetid = tweet(text=tweettext, in_reply_to_tweet_id=tweetid)
 print("バグ数:"+str(bugcount))
 #tweetid = client.create_tweet(text=tweettext, in_reply_to_tweet_id=tweetid).data["id"]
+statusdb = Deta(os.environ.get('SPSOKUHOU_DETA', "")).Base("SSStatus")
 if VERSION_KAKUTEI:
     statusdb.put("./"+KAKUTEIVERSION+".html","Version")
 else:
