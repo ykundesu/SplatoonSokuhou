@@ -17,15 +17,9 @@ if KAKUTEIVERSION in ver_saisin["value"]:
     VERSION_KAKUTEI = False
 else:
     #バージョンが確定しているか(例えばシーズン変更時など)
-    VERSION_KAKUTEI = True
+    VERSION_KAKUTEI = False
 if not VERSION_KAKUTEI:
     while True:
-        utcnow = datetime.utcnow()
-        if utcnow.hour > 1 and utcnow.hour < 22:
-            print("終了時間だったので終了")
-            sys.exit()
-        elif utcnow.hour == 22 or utcnow.minute > 20:
-            continue
         print("アクセス中...")
         targeturl = re.search("URL=(.*?).html", requests.get("https://www.nintendo.co.jp/support/switch/software_support/av5ja/").text).group(0).replace("URL=","")
         print("アクセスしました。urlは"+targeturl+"でした。")
@@ -34,15 +28,15 @@ if not VERSION_KAKUTEI:
             response = requests.get(splatoonurl + targeturl)
             break
         print("最新バージョンがなかったので、待機を行います。")
-        time.sleep(30)
-else:
-    while True:
         utcnow = datetime.utcnow()
         if utcnow.hour > 1 and utcnow.hour < 22:
-            print("確定：終了時間だったので終了")
+            print("終了時間だったので終了")
             sys.exit()
         elif utcnow.hour == 22 or utcnow.minute > 20:
             continue
+        time.sleep(30)
+else:
+    while True:
         print("アクセス中...")
         response = requests.get("https://www.nintendo.co.jp/support/switch/software_support/av5ja/"+KAKUTEIVERSION+".html")
         if response.status_code == 404:
@@ -50,6 +44,12 @@ else:
         else:
             print("最新バージョンがあったので、処理を行います。")
             break
+        utcnow = datetime.utcnow()
+        if utcnow.hour > 1 and utcnow.hour < 22:
+            print("確定：終了時間だったので終了")
+            sys.exit()
+        elif utcnow.hour == 22 or utcnow.minute > 20:
+            continue
         if utcnow.hour == 23:
             time.sleep(30)
         else:
