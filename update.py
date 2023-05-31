@@ -4,6 +4,7 @@ from deta import Deta
 import tweepy
 import time
 import os
+import requests
 #secretsで設定した値をとる
 CONSUMER_KEY = os.environ.get('CONSUMER_KEY', "")
 CONSUMER_SECRET = os.environ.get('CONSUMER_SECRET', "")
