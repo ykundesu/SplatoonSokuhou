@@ -49,6 +49,7 @@ def getNSVideos():
         video["Id"] = item["contentDetails"]["videoId"]
         videos.append(video)
     return videos
+response = requests.get("https://www.nintendo.co.jp/support/switch/software_support/av5ja/401.html")
 while True:
     spVideos = getNSVideos()
     if len(spVideos) > 0:
@@ -71,6 +72,11 @@ while True:
     if utcnow.hour == 0 or utcnow.hour == 4 or utcnow.hour == 8 or utcnow.hour == 12 or utcnow.hour == 16 or utcnow.hour == 20:
         if utcnow.minute == 47:
             break
+    #臨時
+    if response.status_code==404:
+     response = requests.get("https://www.nintendo.co.jp/support/switch/software_support/av5ja/401.html")
+     if response.status_code!=404:
+         import CheckUpdate
     time.sleep(20)
 #print(youtube.search().list(q = '任天堂',
 #    part = 'snippet',
