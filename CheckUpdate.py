@@ -12,12 +12,12 @@ ver_saisin = statusdb.get("Version")
 print("現在のバージョンは"+ver_saisin["value"]+"です。")
 splatoonurl = "https://www.nintendo.co.jp/support/switch/software_support/av5ja/"
 print(requests.get(splatoonurl).text)
-KAKUTEIVERSION = "400"
+KAKUTEIVERSION = "401"
 if KAKUTEIVERSION in ver_saisin["value"]:
     VERSION_KAKUTEI = False
 else:
     #バージョンが確定しているか(例えばシーズン変更時など)
-    VERSION_KAKUTEI = False
+    VERSION_KAKUTEI = True
 if not VERSION_KAKUTEI:
     while True:
         print("アクセス中...")
@@ -62,7 +62,7 @@ reupdateday = re.search("［(.*?)］",response.text).group(0)
 updateday = reupdateday.replace("［","").replace("］","")
 #print(response.text)
 tweetid = None
-
+print(requests.get(splatoonurl).text)
 #secretsで設定した値をとる
 CONSUMER_KEY = os.environ.get('CONSUMER_KEY', "")
 CONSUMER_SECRET = os.environ.get('CONSUMER_SECRET', "")
