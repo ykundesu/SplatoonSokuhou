@@ -1,3 +1,4 @@
 ﻿google-api-python-client
 tweepy
 deta
+requests
