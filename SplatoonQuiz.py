@@ -100,10 +100,10 @@ elif quiztype==4:
         while True:
             randomweaponindex = random.choice(range(len(weapons)))
             randomweapon = weapons[randomweaponindex]
-            if randomweapon["specialWeapon"]["name"] in Options:
+            if randomweapon["subWeapon"]["name"] in Options:
                 continue
             weapons.remove(randomweapon)
-            Options.append(randomweapon["specialWeapon"]["name"])
+            Options.append(randomweapon["subWeapon"]["name"])
             break
 random.shuffle(Options)
 #print(answer)
