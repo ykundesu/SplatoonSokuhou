@@ -71,7 +71,7 @@ while True:
                 try:
                     payload = {"title":"公式新着動画",
                                "url":"https://twitter.com/SplatoonSokuhou/status/"+str(tweetid),
-                               "body":"新しいスプラトゥーンの公式動画が投稿されました！"
+                               "body":"新しいスプラトゥーンの公式動画が投稿されました！\\▼タイトル\\n"+nvd["title"]
                                }
                     pusher.PushMsg("UpdateYoutubeVideo",payload)
                 except Exception as e:
