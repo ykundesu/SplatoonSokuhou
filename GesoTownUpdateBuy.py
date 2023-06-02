@@ -298,5 +298,13 @@ while True:
         tweettext =  "ゲソタウンが更新されました！\n"
         tweettext += "現在のストアはこちらです！\n"
         #tweettext += ""
-        client.create_tweet(text=tweettext, media_ids = medias)
+        tweetid = client.create_tweet(text=tweettext, media_ids = medias).data["tweetid"]
+        try:
+            payload = {"title":"ゲソタウン更新(通常)",
+                       "url":"https://twitter.com/SplatoonSokuhou/status/"+str(tweetid),
+                       "body":"ゲソタウンが更新されました。"
+                       }
+            pusher.PushMsg("GesoUpdateDefault",payload)
+        except Exception as e:
+            print(str(e))
         break

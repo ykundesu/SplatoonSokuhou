@@ -259,7 +259,15 @@ while True:
         tweettext += "・Xマッチ\n=>"+GetTranslation("rules", xmatchdata[1]["settings"][0]["rule"])+"\n"
         #tweettext += GetTranslation("stages", xmatchdata[1]["settings"][0]["stages"][0]["name"])+"、"+GetTranslation("stages", xmatchdata[1]["settings"][0]["stages"][1]["name"])+"\n"
                 
-        client.create_tweet(text=tweettext, media_ids = medias)
+        tweetid = client.create_tweet(text=tweettext, media_ids = medias).data["id"]
+        try:
+            payload = {"title":"スケジュールもうすぐ更新",
+                       "url":"https://twitter.com/SplatoonSokuhou/status/"+str(tweetid),
+                       "body":"スケジュールがもうすぐで更新されます！"
+                       }
+            pusher.PushMsg("ChangeSchedule",payload)
+        except Exception as e:
+            print(str(e))
         IsTweeted = True
         if isbreak:
             break
@@ -281,6 +289,14 @@ while True:
                 weapontext = weapon["name"]
                 weapontext = GetTranslation("weapons", weapontext)
                 tweettext += "・" + weapontext + "\n"
-            client.create_tweet(text=tweettext, media_ids = medias)
+            tweetid = client.create_tweet(text=tweettext, media_ids = medias).data["id"]
+            try:
+                payload = {"title":"サーモンラン新シフト公開",
+                           "url":"https://twitter.com/SplatoonSokuhou/status/"+str(tweetid),
+                           "body":"サーモンランの新シフトが公開されました！\nステージ:"+GetTranslation("stages", salmondata[-1]["stagename"])
+                           }
+                pusher.PushMsg("NewSalmonShift",payload)
+            except Exception as e:
+                print(str(e))
             break
         time.sleep(30)

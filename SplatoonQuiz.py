@@ -186,6 +186,14 @@ while True:
         medias = []
         medias.append(api.media_upload(filename="splatoonquiz.png").media_id)
         tweetid = client.create_tweet(text=tweettext, media_ids = medias).data["id"]
+        try:
+            payload = {"title":"スプラトゥーンクイズ！",
+                       "url":"https://twitter.com/SplatoonSokuhou/status/"+str(tweetid),
+                       "body":"スプラトゥーンクイズが出題されました！"
+                       }
+            pusher.PushMsg("SplatoonQuiz",payload)
+        except Exception as e:
+            print(str(e))
         #回答
         if lastquizid is not None:
             #medias = []

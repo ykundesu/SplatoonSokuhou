@@ -2,3 +2,5 @@
 requests
 Pillow
 beautifulsoup4
+pywebpush
+deta

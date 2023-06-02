@@ -322,5 +322,13 @@ while True:
         tweettext =  "ゲソタウンのピックアップが更新されました！\n"
         tweettext += "現在のピックアップはこちらです！\n"
         tweettext += "次回の更新は1日後です！"
-        client.create_tweet(text=tweettext, media_ids = medias)
+        tweetid = client.create_tweet(text=tweettext, media_ids = medias).data["tweetid"]
+        try:
+            payload = {"title":"ゲソタウン更新(ピックアップ)",
+                       "url":"https://twitter.com/SplatoonSokuhou/status/"+str(tweetid),
+                       "body":"ゲソタウンのピックアップが更新されました！"
+                       }
+            pusher.PushMsg("GesoUpdatePickup",payload)
+        except Exception as e:
+            print(str(e))
         break

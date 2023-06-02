@@ -66,7 +66,15 @@ while True:
                 tweettext += (vd["time"] + timedelta(hours=9)).strftime('%Y年%m月%d日%H時%M分%S秒') +"\n"
                 tweettext += "https://www.youtube.com/watch?v="+vd["Id"]
                 print(tweettext)
-                client.create_tweet(text=tweettext)
+                tweetid = client.create_tweet(text=tweettext).data["id"]
+                try:
+                    payload = {"title":"公式新着動画",
+                               "url":"https://twitter.com/SplatoonSokuhou/status/"+str(tweetid),
+                               "body":"新しいスプラトゥーンの公式動画が投稿されました！"
+                               }
+                    pusher.PushMsg("UpdateYoutubeVideo",payload)
+                except Exception as e:
+                    print(str(e))
             lastsplatoonid = spVideos[0]["Id"]
             statusdb = Deta(os.environ.get('SPSOKUHOU_DETA', "")).Base("SSStatus")
             statusdb.put(lastsplatoonid,"lastsplatoonid")

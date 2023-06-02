@@ -7,6 +7,7 @@ import time
 from deta import Deta
 from datetime import datetime
 import sys
+import pusher
 statusdb = Deta(os.environ.get('SPSOKUHOU_DETA', "")).Base("SSStatus")
 ver_saisin = statusdb.get("Version")
 print("現在のバージョンは"+ver_saisin["value"]+"です。")
@@ -110,6 +111,13 @@ if len(tweettext) * 2 + len(response.url) > 280:
     tweettext = ""
 tweettext += response.url
 tweetid = tweet(tweettext,in_reply_to_tweet_id=tweetid)
+try:
+    payload = {"title":"更新データ発表",
+           "url":"https://twitter.com/SplatoonSokuhou/status/"+str(tweetid),
+           "body":"スプラトゥーンの更新データ「"+version+"」が発表されました。"}
+    pusher.PushMsg("Update",payload)
+except Exception as e:
+    print(str(e))
 #リプライ
 idx = response.text.find("<!-- 更新データ内容 -->")
 idx2 = response.text.find("<!-- /更新データ内容 -->")

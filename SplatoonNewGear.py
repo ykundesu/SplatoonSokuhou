@@ -45,4 +45,12 @@ back.paste(img, (20,20), mask=mask)
 back.save("newgear.png")
 medias = []
 medias.append(api.media_upload(filename="newgear.png").media_id)
-client.create_tweet(text=tweettext, media_ids = medias)
+tweetid = client.create_tweet(text=tweettext, media_ids = medias).data["id"]
+try:
+    payload = {"title":"サーモンランギア更新",
+               "url":"https://twitter.com/SplatoonSokuhou/status/"+str(tweetid),
+               "body":"サーモンランのギアが更新されました！\n今月のギアは「"+gearname+"」です！"
+               }
+    pusher.PushMsg("SalmonChangeGear",payload)
+except Exception as e:
+    print(str(e))

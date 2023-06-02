@@ -17,6 +17,7 @@ jobs:
       CONSUMER_SECRET: ${{ secrets.CS }}
       ACCESS_TOKEN: ${{ secrets.AT }}
       ACCESS_SECRET: ${{ secrets.AS }}
+      SPSOKUHOU_DETA: ${{ secrets.SSD }}
     runs-on: ubuntu-latest
     name: SplatoonSokuhou Tweet GesoTown
     steps:

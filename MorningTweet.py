@@ -272,5 +272,13 @@ while True:
          tweettext+="新シーズンは1時間後(午前9時)です！\n新武器や新ステージ、イベントマッチなど、新要素を楽しみましょう！"
         else:
          tweettext += "次のスケジュール変更は1時間後(午前9時)です！"
-        client.create_tweet(text=tweettext, media_ids = medias)
+        tweetid = client.create_tweet(text=tweettext, media_ids = medias).data["id"]
+        try:
+            payload = {"title":"朝のツイート",
+                       "url":"https://twitter.com/SplatoonSokuhou/status/"+str(tweetid),
+                       "body":"朝のツイートがツイートされました！"
+                       }
+            pusher.PushMsg("MorningTweet",payload)
+        except Exception as e:
+            print(str(e))
         break
