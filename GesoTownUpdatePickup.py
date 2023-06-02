@@ -323,7 +323,7 @@ while True:
         tweettext =  "ゲソタウンのピックアップが更新されました！\n"
         tweettext += "現在のピックアップはこちらです！\n"
         tweettext += "次回の更新は1日後です！"
-        tweetid = client.create_tweet(text=tweettext, media_ids = medias).data["tweetid"]
+        tweetid = client.create_tweet(text=tweettext, media_ids = medias).data["id"]
         try:
             payload = {"title":"ゲソタウン更新(ピックアップ)",
                        "url":"https://twitter.com/SplatoonSokuhou/status/"+str(tweetid),
