@@ -8,6 +8,7 @@ import sys
 from PIL import Image, ImageDraw, ImageFont
 from datetime import datetime
 from deta import Deta
+import pusher
 utcnow = datetime.utcnow()
 if utcnow.hour != 14 and utcnow.hour != 15 and utcnow.hour != 2 and utcnow.hour != 3:
     sys.exit()

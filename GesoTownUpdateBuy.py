@@ -4,6 +4,7 @@ import requests
 from datetime import datetime
 from PIL import Image, ImageDraw, ImageFont
 import io
+import pusher
 import time
 #secretsで設定した値をとる
 CONSUMER_KEY = os.environ.get('CONSUMER_KEY', "")

@@ -3,6 +3,7 @@ from PIL import Image, ImageDraw, ImageFont
 import requests
 import io
 import os
+import pusher
 #secretsで設定した値をとる
 CONSUMER_KEY = os.environ.get('CONSUMER_KEY', "")
 CONSUMER_SECRET = os.environ.get('CONSUMER_SECRET', "")
