@@ -24,7 +24,7 @@ def Push(payload, endpoint,authcode,p256dh):
 }'''
     #data = '{"subscription":{"endpoint":"'+endpoint+'","expirationTime":null,"keys": {"auth":"'+authcode+'","p256dh":"'+p256dh+'"}},"payload":{"title":"'+payload.get("title","[テストTitle]")+'","body":"'+payload.get("body","[テストBody]")+'","data": {"url": "{0}",}}}'
     data = data.replace("{endpoint}",endpoint).replace("{auth}",authcode).replace("{p256dh}",p256dh).replace("{title}",payload.get("title","[titleテスト]"))
-    data = data.replace("{body}",payload.get("body","[bodyテスト]").replace("\n","\\n")).replace("{url}",payload.get("url","[urlテスト]"))
+    data = data.replace("{body}",payload.get("body","[bodyテスト]")).replace("{url}",payload.get("url","[urlテスト]"))
     print(data)
     data = data.encode()
     #print(data1)
