@@ -50,7 +50,7 @@ tweetid = client.create_tweet(text=tweettext, media_ids = medias).data["id"]
 try:
     payload = {"title":"サーモンランギア更新",
                "url":"https://twitter.com/SplatoonSokuhou/status/"+str(tweetid),
-               "body":"サーモンランのギアが更新されました！\n今月のギアは「"+gearname+"」です！"
+               "body":"サーモンランのギアが更新されました！\\n今月のギアは「"+gearname+"」です！"
                }
     pusher.PushMsg("SalmonChangeGear",payload)
 except Exception as e:
