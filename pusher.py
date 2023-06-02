@@ -4,7 +4,7 @@ import threading
 from deta import Deta
 pusherdb = Deta(os.environ.get('SPSOKUHOU_DETA', "")).Base("SSPusher")
 def Push(payload, endpoint,authcode,p256dh):
-    print("プッシュ通知送信")
+    print("プッシュ通知送信開始!")
     headers = {
         'Content-Type': 'application/x-www-form-urlencoded',
     }
