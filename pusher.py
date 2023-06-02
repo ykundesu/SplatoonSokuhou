@@ -18,6 +18,7 @@ def Push(payload, endpoint,authcode,p256dh):
 },"payload":{
  "title":"{title}",
  "body":"{body}",
+ "icon": "https://splatoonsokuhouimage.web.fc2.com/PushIcon.png",
  "badge": "https://splatoonsokuhouimage.web.fc2.com/PushIcon.png",
  "data":{"url":"{url}"}
  }
