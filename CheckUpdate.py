@@ -18,7 +18,7 @@ if KAKUTEIVERSION in ver_saisin["value"]:
     VERSION_KAKUTEI = False
 else:
     #バージョンが確定しているか(例えばシーズン変更時など)
-    VERSION_KAKUTEI = True
+    VERSION_KAKUTEI = False
 if not VERSION_KAKUTEI:
     while True:
         print("アクセス中...")
