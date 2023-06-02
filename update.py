@@ -68,6 +68,7 @@ while True:
                 print(tweettext)
                 client.create_tweet(text=tweettext)
             lastsplatoonid = spVideos[0]["Id"]
+	    statusdb = Deta(os.environ.get('SPSOKUHOU_DETA', "")).Base("SSStatus")
             statusdb.put(lastsplatoonid,"lastsplatoonid")
     utcnow = datetime.utcnow()
     if utcnow.hour == 0 or utcnow.hour == 4 or utcnow.hour == 8 or utcnow.hour == 12 or utcnow.hour == 16 or utcnow.hour == 20:
