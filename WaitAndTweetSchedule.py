@@ -294,7 +294,7 @@ while True:
             try:
                 payload = {"title":"サーモンラン新シフト公開",
                            "url":"https://twitter.com/SplatoonSokuhou/status/"+str(tweetid),
-                           "body":"サーモンランの新シフトが公開されました！\nステージ:"+GetTranslation("stages", salmondata[-1]["stagename"])
+                           "body":"サーモンランの新シフトが公開されました！\\nステージ:"+GetTranslation("stages", salmondata[-1]["stagename"])
                            }
                 pusher.PushMsg("NewSalmonShift",payload)
             except Exception as e:
