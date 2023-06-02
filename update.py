@@ -74,10 +74,10 @@ while True:
         if utcnow.minute == 47:
             break
     #臨時
-    if response.status_code==404:
-     response = requests.get("https://www.nintendo.co.jp/support/switch/software_support/av5ja/401.html")
-     if response.status_code!=404:
-         import CheckUpdate
+    #if response.status_code==404:
+    # response = requests.get("https://www.nintendo.co.jp/support/switch/software_support/av5ja/401.html")
+    # if response.status_code!=404:
+    #     import CheckUpdate
     time.sleep(20)
 #print(youtube.search().list(q = '任天堂',
 #    part = 'snippet',
