@@ -26,6 +26,8 @@ client = tweepy.Client(
 transjson = requests.get("https://splatoon3.ink/data/locale/ja-JP.json").json()
 def GetTranslation(transtype, textid):
     return transjson.get(transtype,{}).get(textid, {}).get("name","翻訳できませんでした。")
+def GetTranslationRegulation(transtype, textid):
+    return transjson.get(transtype,{}).get(textid, {}).get("regulation","翻訳できませんでした。")
 def GetSchedulesData(jsonobj, mode):
     objs = []
     for sch in jsonobj["data"][mode + "Schedules"]["nodes"]:
@@ -206,7 +208,76 @@ def CreateSchImage(jsons, text, text_x, IsBackPaste = True):
         back.paste(img, (105,10),mask=mask)
         img = back
     return img
+def CreateEventImage(jsons):
+    back = Image.open("SplatoonBack_White.png").crop((0,0,960,625))
+    img = Image.open("SplatoonBack_Black.png").crop((0,0,900,600))
+    font = ImageFont.truetype("Corporate-Logo-Rounded-Bold-ver3.otf", 60)
+    font_big = ImageFont.truetype("Corporate-Logo-Rounded-Bold-ver3.otf", 65)
+    font_chu = ImageFont.truetype("Corporate-Logo-Rounded-Bold-ver3.otf", 45)
+    font_mini = ImageFont.truetype("Corporate-Logo-Rounded-Bold-ver3.otf", 30)
+    font_supermini = ImageFont.truetype("Corporate-Logo-Rounded-Bold-ver3.otf", 20)
+    
+    # 角丸にするためのマスクを作成
+    mask = Image.new("L", img.size, 0)
+    radius = 50
+    draw = ImageDraw.Draw(mask)
+    draw.rounded_rectangle((0, 0, img.width, img.height), radius, fill=255)
+
+    draw = ImageDraw.Draw(img)
+    
+    draw.text((460, 50), "イベントマッチ", font = font, fill = "#FFFFFF", anchor='mm')
+
+    draw.text((460, 130), GetTranslation("events", jsons["leagueMatchSetting"]["leagueMatchEvent"]["id"]), font = font, fill = "#FFFFFF", anchor="mm")
+    stage = Image.open(io.BytesIO(requests.get(jsons["leagueMatchSetting"]["vsStages"][0]["image"]["url"]).content))
+    stage = stage.resize((int(stage.size[0] / 1.25),
+                          int(stage.size[1] / 1.25)))
+    img.paste(stage, (140, 400))
+
+    stage = Image.open(io.BytesIO(requests.get(jsons["leagueMatchSetting"]["vsStages"][-1]["image"]["url"]).content))
+    stage = stage.resize((int(stage.size[0] / 1.25),
+                          int(stage.size[1] / 1.25)))
+    img.paste(stage, (480, 400))
+
+    draw.text((440, 190), (datetime.strptime(jsons["timePeriods"][0]["startTime"], '%Y-%m-%dT%H:%M:%SZ') + timedelta(hours=9)).strftime('%Y年%m月%d日%H時')+"開始", font = font_chu, fill = "#FFFFFF", anchor="mm")
+    draw.text((440, 240), (datetime.strptime(jsons["timePeriods"][1]["startTime"], '%Y-%m-%dT%H:%M:%SZ') + timedelta(hours=9)).strftime('%Y年%m月%d日%H時')+"開始", font = font_chu, fill = "#FFFFFF", anchor="mm")
+    draw.text((440, 290), (datetime.strptime(jsons["timePeriods"][2]["startTime"], '%Y-%m-%dT%H:%M:%SZ') + timedelta(hours=9)).strftime('%Y年%m月%d日%H時')+"開始", font = font_chu, fill = "#FFFFFF", anchor="mm")
+    draw.text((480, 350), GetTranslation("rules", jsons["leagueMatchSetting"]["vsRule"]["id"]), font = font, fill = "#FFFFFF", anchor="mm")
+    
+    """if datetime.utcnow() > jsons["start"]:
+        starttext = ""
+    else:
+        starttext = (jsons["start"] + timedelta(hours=9)).strftime('%Y年%m月%d日%H時')+"開始"
+    draw.text((550, 80), starttext, font = font_mini, fill = "#FFFFFF")
+
+    #オカシラシャケ
+    draw.text((545, 130), "オカシラシャケ", font = font_big, fill = "#FFFFFF")
+    draw.text((615, 200), GetSalmonoidName(jsons["kingsalmonid"]), font = font_chu, fill = "#FFFFFF")
+    
+    #武器
+    index = 0
+    for weapon in jsons["weapons"]:
+        weaponimg = Image.open(io.BytesIO(requests.get(weapon["image"]).content))
+        weaponimg = weaponimg.resize((int(weaponimg.size[0] / 2),
+                              int(weaponimg.size[1] / 2)))
+        additional = 50
+        img.paste(weaponimg, (40 + additional + (index * 190), 425), weaponimg)
+        weapontext = weapon["name"]
+        if weapontext is not "6e17fbe20efecca9":
+            weapontext = GetTranslation("weapons", weapontext)
+        else:
+            weapontext = ""
+        draw.text((50 + additional + (index * 190), 550), weapontext, font = font_supermini, fill = "#FFFFFF")
+        index += 1
+        """
+    back.paste(img, (30,10), mask=mask)
+    return back
+
 IsTweeted = False
+
+IsEvent = False
+IsSalmon = False
+lasteventrule = None
+
 while True:
     utcnow = datetime.utcnow()
     if utcnow.hour % 2 == 0 and not IsTweeted:
@@ -242,6 +313,11 @@ while True:
             CreateSalmonImage(salmondata[1],"サーモンラン", 300).save("salmon.png")
             medias.append(api.media_upload(filename="salmon.png").media_id)
             isbreak = False
+            IsSalmon = True
+        if datetime.strptime(schjson["data"]["eventSchedules"]["nodes"][0]["timePeriods"][-1]["startTime"], '%Y-%m-%dT%H:%M:%SZ') < datetime.utcnow() and datetime.strptime(schjson["data"]["eventSchedules"]["nodes"][0]["timePeriods"][-1]["endtime"], '%Y-%m-%dT%H:%M:%SZ') > datetime.utcnow():
+            isbreak = False
+            IsEvent = True
+            lasteventrule = schjson["data"]["eventSchedules"]["nodes"][-1]["timePeriods"][-1]["startTime"]
         tweettext = "もうすぐでスケジュール更新！\n"
         hourtime = utcnow.hour + 1 + 9
         if hourtime >= 24:
@@ -273,8 +349,10 @@ while True:
         if isbreak:
             break
     elif IsTweeted and utcnow.hour % 2 == 0:
-        time.sleep(30)
-        schjson = requests.get("https://splatoon3.ink/data/schedules.json").json()
+       time.sleep(30)
+       schjson = requests.get("https://splatoon3.ink/data/schedules.json").json()
+       IsBreak = False
+       if IsSalmon:
         salmondata = GetSalmonData(schjson, "regular")
         if salmondata[0]["end"] > datetime.utcnow():
             CreateSalmonImage(salmondata[-1],"サーモンラン", 300).save("salmonnew.png")
@@ -299,5 +377,29 @@ while True:
                 pusher.PushMsg("NewSalmonShift",payload)
             except Exception as e:
                 print(str(e))
-            break
-        time.sleep(30)
+            IsBreak = True
+       if IsEvent:
+           if datetime.strptime(schjson["data"]["eventSchedules"]["nodes"][0]["timePeriods"][-1]["endTime"], '%Y-%m-%dT%H:%M:%SZ') > datetime.utcnow() and schjson["data"]["eventSchedules"]["nodes"][-1]["timePeriods"][-1]["startTime"] is not lasteventrule:
+            transjson = requests.get("https://splatoon3.ink/data/locale/ja-JP.json").json()
+            CreateEventImage(schjson["data"]["eventSchedules"]["nodes"][-1]).save("event.png")
+            tweettext =  "新しいイベントマッチスケジュールが公開されました！\n"
+            tweettext += "▼ルール\n"
+            tweettext += GetTranslation("events", schjson["data"]["eventSchedules"]["nodes"][-1]["leagueMatchSetting"]["leagueMatchEvent"]["id"])
+            medias = []
+            medias.append(api.media_upload(filename="event.png").media_id)
+            tweetid = client.create_tweet(text=tweettext, media_ids = medias).data["id"]
+            try:
+                payload = {"title":"イベントマッチ新スケジュール",
+                           "url":"https://twitter.com/SplatoonSokuhou/status/"+str(tweetid),
+                           "body":"イベントマッチの新スケジュールが公開されました！"
+                           }
+                pusher.PushMsg("NewEventSch",payload)
+            except Exception as e:
+                print(str(e))
+            tweettext += "▼ルール説明"
+            tweettext += GetTranslationRegulation("events", schjson["data"]["eventSchedules"]["nodes"][-1]["leagueMatchSetting"]["leagueMatchEvent"]["id"]).replace("<br","\n").replace("\n\n","\n").replace(" ","").replace(">","")
+            client.create_tweet(text=tweettext, in_reply_to_tweet_id = tweetid)
+            IsBreak = True
+       if IsBreak:
+           break           
+       time.sleep(30)
