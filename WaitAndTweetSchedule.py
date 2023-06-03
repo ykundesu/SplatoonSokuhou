@@ -314,7 +314,7 @@ while True:
             medias.append(api.media_upload(filename="salmon.png").media_id)
             isbreak = False
             IsSalmon = True
-        if datetime.strptime(schjson["data"]["eventSchedules"]["nodes"][0]["timePeriods"][-1]["startTime"], '%Y-%m-%dT%H:%M:%SZ') < datetime.utcnow() and datetime.strptime(schjson["data"]["eventSchedules"]["nodes"][0]["timePeriods"][-1]["endtime"], '%Y-%m-%dT%H:%M:%SZ') > datetime.utcnow():
+        if datetime.strptime(schjson["data"]["eventSchedules"]["nodes"][0]["timePeriods"][-1]["startTime"], '%Y-%m-%dT%H:%M:%SZ') < datetime.utcnow() and datetime.strptime(schjson["data"]["eventSchedules"]["nodes"][0]["timePeriods"][-1]["endTime"], '%Y-%m-%dT%H:%M:%SZ') > datetime.utcnow():
             isbreak = False
             IsEvent = True
             lasteventrule = schjson["data"]["eventSchedules"]["nodes"][-1]["timePeriods"][-1]["startTime"]
