@@ -319,7 +319,7 @@ while True:
             medias.append(api.media_upload(filename="salmon.png").media_id)
             isbreak = False
             IsSalmon = True
-        if datetime.strptime(schjson["data"]["eventSchedules"]["nodes"][0]["timePeriods"][-1]["startTime"], '%Y-%m-%dT%H:%M:%SZ') < datetime.utcnow() and datetime.strptime(schjson["data"]["eventSchedules"]["nodes"][0]["timePeriods"][-1]["endtime"], '%Y-%m-%dT%H:%M:%SZ') > datetime.utcnow():
+        if datetime.strptime(schjson["data"]["eventSchedules"]["nodes"][0]["timePeriods"][-1]["startTime"], '%Y-%m-%dT%H:%M:%SZ') < datetime.utcnow() and datetime.strptime(schjson["data"]["eventSchedules"]["nodes"][0]["timePeriods"][-1]["endTime"], '%Y-%m-%dT%H:%M:%SZ') > datetime.utcnow():
             isbreak = False
             IsEvent = True
             lasteventrule = schjson["data"]["eventSchedules"]["nodes"][-1]["timePeriods"][-1]["startTime"]
@@ -392,7 +392,7 @@ while True:
                 print(str(e))
             IsBreak = True
        if IsEvent:
-           if datetime.strptime(schjson["data"]["eventSchedules"]["nodes"][0]["timePeriods"][-1]["endTime"], '%Y-%m-%dT%H:%M:%SZ') > datetime.utcnow() and schjson["data"]["eventSchedules"]["nodes"][-1]["timePeriods"][-1]["startTime"] is not lasteventrule:
+           if len(schjson["data"]["eventSchedules"]["nodes"])>1 and  datetime.strptime(schjson["data"]["eventSchedules"]["nodes"][0]["timePeriods"][-1]["endTime"], '%Y-%m-%dT%H:%M:%SZ') > datetime.utcnow() and schjson["data"]["eventSchedules"]["nodes"][-1]["timePeriods"][-1]["startTime"] is not lasteventrule:
             transjson = requests.get("https://splatoon3.ink/data/locale/ja-JP.json").json()
             CreateEventImage(schjson["data"]["eventSchedules"]["nodes"][-1]).save("event.png")
             tweettext =  "新しいイベントマッチスケジュールが公開されました！\n"
