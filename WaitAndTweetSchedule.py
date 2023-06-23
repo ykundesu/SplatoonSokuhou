@@ -381,7 +381,7 @@ while True:
                 tweettext += "・" + weapontext + "\n"
             medias.append(api.media_upload(filename="salmonnew.png").media_id)
             tweetid = client.create_tweet(text=tweettext, media_ids = medias).data["id"]
-            AtProWrapper.PostMessage(tweettext, imagedata=("salmonnew.png",""))
+            AtProWrapper.PostMessage(tweettext, imagedata=[("salmonnew.png","")])
             try:
                 payload = {"title":"サーモンラン新シフト公開",
                            "url":"https://twitter.com/SplatoonSokuhou/status/"+str(tweetid),
@@ -401,7 +401,7 @@ while True:
             medias = []
             medias.append(api.media_upload(filename="event.png").media_id)
             tweetid = client.create_tweet(text=tweettext, media_ids = medias).data["id"]
-            atmsgdata = AtProWrapper.PostMessage(tweettext, imagedata=("event.png",""))
+            atmsgdata = AtProWrapper.PostMessage(tweettext, imagedata=[("event.png","")])
             try:
                 payload = {"title":"イベントマッチ新スケジュール",
                            "url":"https://twitter.com/SplatoonSokuhou/status/"+str(tweetid),

@@ -4,3 +4,4 @@ deta
 requests
 pywebpush
 atproto
+Pillow
