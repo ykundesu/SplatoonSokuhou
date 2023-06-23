@@ -8,6 +8,7 @@ from deta import Deta
 from datetime import datetime
 import sys
 import pusher
+import AtProWrapper
 statusdb = Deta(os.environ.get('SPSOKUHOU_DETA', "")).Base("SSStatus")
 ver_saisin = statusdb.get("Version")
 print("現在のバージョンは"+ver_saisin["value"]+"です。")
@@ -82,12 +83,16 @@ client = tweepy.Client(
 	access_token_secret = ACCESS_SECRET
 )
 tweetcount = 20
+
+oldSendMsg = None
 def tweet(text, IsTweetCount = True, in_reply_to_tweet_id = None):
+    global oldSendMsg
     global tweetcount
     if IsTweetCount:
         tweetcount -= 1
-    result = "0"
-    result = client.create_tweet(text=text, in_reply_to_tweet_id=in_reply_to_tweet_id).data["id"]
+    if tweetcount > 0:
+        result = client.create_tweet(text=text, in_reply_to_tweet_id=in_reply_to_tweet_id).data["id"]
+    oldSendMsg = AtProWrapper.PostMessage(tweettext, reply_to=oldSendMsg)
     #print(text)
     print("ツイートしました。残りツイート可能数:"+str(tweetcount))
     return result
@@ -202,34 +207,28 @@ tweettext = "▼アップデートの項目▼\n"
 for item in items.keys():
     itemname = bs4.BeautifulSoup(item, 'html.parser').find("h3").get_text()
     if (len(tweettext) + len("・") + len(itemname) + len("\n")) > 140:
-        if tweetcount > 0:
-            tweetid = tweet(text=tweettext, in_reply_to_tweet_id=tweetid)
+        tweetid = tweet(text=tweettext, in_reply_to_tweet_id=tweetid)
         tweettext = ""
     tweettext += "・" + itemname + "\n"
-if len(tweettext) > 0:
-    if tweetcount > 0:
-        tweetid = tweet(text=tweettext, in_reply_to_tweet_id=tweetid)
+tweetid = tweet(text=tweettext, in_reply_to_tweet_id=tweetid)
 tweettext = ""
 #ウェポンとかの変更
 for ability in ChangeAbility.items():
     tweettext += "▼"+ability[0]+"の調整対象▼\n"
     for changeab in ability[1]:
         if (len(tweettext) + len("・") + len(changeab) + len("\n")) > 140:
-            if tweetcount > 0:
-                tweetid = tweet(text=tweettext, in_reply_to_tweet_id=tweetid)
+            tweetid = tweet(text=tweettext, in_reply_to_tweet_id=tweetid)
             tweettext = ""
         tweettext += "・" + changeab + "\n"
 if len(tweettext) > 0:
-    if tweetcount > 0:
-        tweetid = tweet(text=tweettext, in_reply_to_tweet_id=tweetid)
+    tweetid = tweet(text=tweettext, in_reply_to_tweet_id=tweetid)
 tweettext = ""
 if len(SpecialPointUpdates) > 0:
     tweettext = "▼スペシャルポイント変更▼\n"
     for spu in SpecialPointUpdates.items():
         newtext = "・" + spu[0] + "\n　"+spu[1][0]+"p=>"+spu[1][1]+"p\n"
         if (len(tweettext) + len(newtext)) > 140:
-            if tweetcount > 0:
-                tweetid = tweet(text=tweettext, in_reply_to_tweet_id=tweetid)
+            tweetid = tweet(text=tweettext, in_reply_to_tweet_id=tweetid)
             tweettext = ""
         tweettext += newtext
 newtext = "▼アップデート情報▼\n"
@@ -237,15 +236,12 @@ newtext += "バグ修正数："+str(bugcount)
 print(str(len(tweettext) + len(newtext)))
 #print(newtext)
 if len(tweettext) + len(newtext) > 140:
-    if tweetcount > 0:
         tweetid = tweet(text=tweettext, in_reply_to_tweet_id=tweetid)
-    if tweetcount > 0:
         tweettext = newtext
         tweetid = tweet(text=tweettext, in_reply_to_tweet_id=tweetid)
 else:
     tweettext += newtext
-    if tweetcount > 0:
-        tweetid = tweet(text=tweettext, in_reply_to_tweet_id=tweetid)
+    tweetid = tweet(text=tweettext, in_reply_to_tweet_id=tweetid)
 print("バグ数:"+str(bugcount))
 #tweetid = client.create_tweet(text=tweettext, in_reply_to_tweet_id=tweetid).data["id"]
 statusdb = Deta(os.environ.get('SPSOKUHOU_DETA', "")).Base("SSStatus")

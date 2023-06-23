@@ -13,6 +13,8 @@ jobs:
       ACCESS_TOKEN: ${{ secrets.AT }}
       ACCESS_SECRET: ${{ secrets.AS }}
       SPSOKUHOU_DETA: ${{ secrets.SSD }}
+      BSKY_ID: ${{ secrets.BSKYID }}
+      BSKY_APPPASS: ${{ secrets.BSKYAPASS }}
     runs-on: ubuntu-latest
     name: SplatoonSokuhou Tweet GesoTown Pickup
     steps:
