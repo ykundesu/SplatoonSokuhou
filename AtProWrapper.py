@@ -18,7 +18,7 @@ def PostMessage(text, reply_to = None, imagedata = None, client=None):
     client = getclient(client)
     if reply_to != None:
         reply_to = models.AppBskyFeedPost.ReplyRef(reply_to, reply_to)
-    if imagebytes == None:
+    if imagedata == None:
         return client.send_post(text=text, reply_to=reply_to)
     else:
         images = []

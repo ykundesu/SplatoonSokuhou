@@ -6,6 +6,7 @@ from PIL import Image, ImageDraw, ImageFont
 import io
 import time
 import pusher
+import AtProWrapper
 #secretsで設定した値をとる
 CONSUMER_KEY = os.environ.get('CONSUMER_KEY', "")
 CONSUMER_SECRET = os.environ.get('CONSUMER_SECRET', "")
@@ -324,6 +325,7 @@ while True:
         tweettext += "現在のピックアップはこちらです！\n"
         tweettext += "次回の更新は1日後です！"
         tweetid = client.create_tweet(text=tweettext, media_ids = medias).data["id"]
+        AtProWrapper.PostMessage(tweettext, imagedata=[("pickupgear.png","")])
         try:
             payload = {"title":"ゲソタウン更新(ピックアップ)",
                        "url":"https://twitter.com/SplatoonSokuhou/status/"+str(tweetid),

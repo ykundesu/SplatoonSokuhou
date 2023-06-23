@@ -301,6 +301,7 @@ while True:
         tweettext += "現在のストアはこちらです！\n"
         #tweettext += ""
         tweetid = client.create_tweet(text=tweettext, media_ids = medias).data["id"]
+        AtProWrapper.PostMessage(tweettext, imagedata=[("gear.png","")])
         try:
             payload = {"title":"ゲソタウン更新(通常)",
                        "url":"https://twitter.com/SplatoonSokuhou/status/"+str(tweetid),
