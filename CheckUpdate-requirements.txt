@@ -4,3 +4,4 @@ deta
 beautifulsoup4
 Pillow
 pywebpush
+atproto

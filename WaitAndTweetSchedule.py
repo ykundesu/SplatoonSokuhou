@@ -3,6 +3,7 @@ import tweepy
 import requests
 from datetime import datetime, timedelta
 from PIL import Image, ImageDraw, ImageFont
+import AtProWrapper
 import io
 import time
 import pusher
@@ -305,12 +306,16 @@ while True:
         xmatchdata = GetSchedulesData(schjson, "x")
         CreateSchImage(xmatchdata[1]["settings"][0], "Xマッチ", 200).save("xmatch.png")
         salmondata = GetSalmonData(schjson, "regular")
-        medias.append(api.media_upload(filename="regular.png").media_id)
-        medias.append(api.media_upload(filename="bankara.png").media_id)
-        medias.append(api.media_upload(filename="xmatch.png").media_id)
+        
+        filemedias = []
+        filemedias.append("regular.png")
+        filemedias.append("bankara.png")
+        filemedias.append("xmatch.png")        
+
         isbreak = True
         if ((salmondata[1]["start"] - datetime.utcnow()).total_seconds() <= 3600):
             CreateSalmonImage(salmondata[1],"サーモンラン", 300).save("salmon.png")
+            filemedias.append("salmon.png")
             medias.append(api.media_upload(filename="salmon.png").media_id)
             isbreak = False
             IsSalmon = True
@@ -335,8 +340,15 @@ while True:
 
         tweettext += "・Xマッチ\n=>"+GetTranslation("rules", xmatchdata[1]["settings"][0]["rule"])+"\n"
         #tweettext += GetTranslation("stages", xmatchdata[1]["settings"][0]["stages"][0]["name"])+"、"+GetTranslation("stages", xmatchdata[1]["settings"][0]["stages"][1]["name"])+"\n"
-                
+
+        for md in filemedias:
+            medias.append(api.media_upload(filename=md).media_id)
         tweetid = client.create_tweet(text=tweettext, media_ids = medias).data["id"]
+        
+        medias = []
+        for md in filemedias:
+            medias.append((md,""))
+        AtProWrapper.PostMessage(tweettext, imagedata=medias)
         try:
             payload = {"title":"スケジュールもうすぐ更新",
                        "url":"https://twitter.com/SplatoonSokuhou/status/"+str(tweetid),
@@ -357,7 +369,6 @@ while True:
         if salmondata[0]["end"] > datetime.utcnow():
             CreateSalmonImage(salmondata[-1],"サーモンラン", 300).save("salmonnew.png")
             medias = []
-            medias.append(api.media_upload(filename="salmonnew.png").media_id)
             tweettext =  "新しいサーモンランのスケジュールが公開されました！\n"
             tweettext += "▼開始日時\n"
             tweettext += (salmondata[-1]["start"] + timedelta(hours=9)).strftime('%Y年%m月%d日%H時')+"\n"
@@ -368,7 +379,9 @@ while True:
                 weapontext = weapon["name"]
                 weapontext = GetTranslation("weapons", weapontext)
                 tweettext += "・" + weapontext + "\n"
+            medias.append(api.media_upload(filename="salmonnew.png").media_id)
             tweetid = client.create_tweet(text=tweettext, media_ids = medias).data["id"]
+            AtProWrapper.PostMessage(tweettext, imagedata=("salmonnew.png",""))
             try:
                 payload = {"title":"サーモンラン新シフト公開",
                            "url":"https://twitter.com/SplatoonSokuhou/status/"+str(tweetid),
@@ -388,6 +401,7 @@ while True:
             medias = []
             medias.append(api.media_upload(filename="event.png").media_id)
             tweetid = client.create_tweet(text=tweettext, media_ids = medias).data["id"]
+            atmsgdata = AtProWrapper.PostMessage(tweettext, imagedata=("event.png",""))
             try:
                 payload = {"title":"イベントマッチ新スケジュール",
                            "url":"https://twitter.com/SplatoonSokuhou/status/"+str(tweetid),
@@ -399,6 +413,7 @@ while True:
             tweettext += "▼ルール説明"
             tweettext += GetTranslationRegulation("events", schjson["data"]["eventSchedules"]["nodes"][-1]["leagueMatchSetting"]["leagueMatchEvent"]["id"]).replace("<br","\n").replace("\n\n","\n").replace(" ","").replace(">","")
             client.create_tweet(text=tweettext, in_reply_to_tweet_id = tweetid)
+            AtProWrapper.PostMessage(tweettext, reply_to=atmsgdata)
             IsBreak = True
        if IsBreak:
            break           
