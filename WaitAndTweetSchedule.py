@@ -410,8 +410,8 @@ while True:
                 pusher.PushMsg("NewEventSch",payload)
             except Exception as e:
                 print(str(e))
-            tweettext += "▼ルール説明"
-            tweettext += GetTranslationRegulation("events", schjson["data"]["eventSchedules"]["nodes"][-1]["leagueMatchSetting"]["leagueMatchEvent"]["id"]).replace("<br","\n").replace("\n\n","\n").replace(" ","").replace(">","")
+            tweettext = "▼ルール説明\n"
+            tweettext += GetTranslationRegulation("events", schjson["data"]["eventSchedules"]["nodes"][-1]["leagueMatchSetting"]["leagueMatchEvent"]["id"]).replace("<br","\n").replace("\n\n","\n").replace(" ","").replace(">","").replace("/","")
             client.create_tweet(text=tweettext, in_reply_to_tweet_id = tweetid)
             AtProWrapper.PostMessage(tweettext, reply_to=atmsgdata)
             IsBreak = True
