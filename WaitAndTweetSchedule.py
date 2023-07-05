@@ -3,7 +3,7 @@ import tweepy
 import requests
 from datetime import datetime, timedelta
 from PIL import Image, ImageDraw, ImageFont
-import AtProWrapper
+#import AtProWrapper
 import io
 import time
 import pusher
@@ -347,7 +347,7 @@ while True:
         medias = []
         for md in filemedias:
             medias.append((md,""))
-        AtProWrapper.PostMessage(tweettext, imagedata=medias)
+        #AtProWrapper.PostMessage(tweettext, imagedata=medias)
         try:
             payload = {"title":"スケジュールもうすぐ更新",
                        "url":"https://twitter.com/SplatoonSokuhou/status/"+str(tweetid),
