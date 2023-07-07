@@ -8,7 +8,7 @@ from deta import Deta
 from datetime import datetime
 import sys
 import pusher
-#import AtProWrapper
+import AtProWrapper
 statusdb = Deta(os.environ.get('SPSOKUHOU_DETA', "")).Base("SSStatus")
 ver_saisin = statusdb.get("Version")
 print("現在のバージョンは"+ver_saisin["value"]+"です。")
@@ -92,7 +92,7 @@ def tweet(text, IsTweetCount = True, in_reply_to_tweet_id = None):
         tweetcount -= 1
     if tweetcount > 0:
         result = client.create_tweet(text=text, in_reply_to_tweet_id=in_reply_to_tweet_id).data["id"]
-    oldSendMsg = None#AtProWrapper.PostMessage(tweettext, reply_to=oldSendMsg)
+    oldSendMsg = AtProWrapper.PostMessage(tweettext, reply_to=oldSendMsg)
     #print(text)
     print("ツイートしました。残りツイート可能数:"+str(tweetcount))
     return result
